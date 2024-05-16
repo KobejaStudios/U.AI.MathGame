@@ -61,3 +61,5 @@ crashlytics-build.properties
 *.dwlt
 U.005/UserSettings/Layouts/CurrentMaximizeLayout.dwlt
 U.005/UserSettings/Layouts/default-2021.dwlt
+Gemini_MathGame/Assets/Scripts/Secret.cs
+Gemini_MathGame/Assets/Scripts/Secret.cs.meta
