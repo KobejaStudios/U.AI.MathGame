@@ -9,6 +9,7 @@ public class GameController : MonoBehaviour
 {
     public static GameController Instance;
     [SerializeField] private BubblesController _bubblesController;
+    [SerializeField] private ScoreController _scoreController;
     [SerializeField] private TMP_InputField _inputField;
 
     private void Awake()
@@ -28,6 +29,13 @@ public class GameController : MonoBehaviour
         EventManager.AddListener(GameEvents.BubbleClicked, BubbleClicked);
         EventManager.AddListener(GameEvents.SolutionEvaluated, SolutionEvaluated);
         EventManager.AddListener(GameEvents.RoundStarted, RoundStart);
+    }
+
+    private void OnDestroy()
+    {
+        EventManager.RemoveListener(GameEvents.BubbleClicked, BubbleClicked);
+        EventManager.RemoveListener(GameEvents.SolutionEvaluated, SolutionEvaluated);
+        EventManager.RemoveListener(GameEvents.RoundStarted, RoundStart);
     }
 
     private void RoundStart(Dictionary<string, object> context)
@@ -51,6 +59,7 @@ public class GameController : MonoBehaviour
         if (solution == target)
         {
             Debug.Log($"Good Job!");
+            _scoreController.IncrementScore(5);
         }
         else
         {

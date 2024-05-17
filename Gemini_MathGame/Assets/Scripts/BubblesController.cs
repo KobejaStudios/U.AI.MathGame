@@ -33,7 +33,7 @@ public class BubblesController : MonoBehaviour
         
         var eventData = new Dictionary<string, object>
         {
-            ["solution"] = solution
+            ["solution"] = solution,
         };
         EventManager.RaiseEvent(GameEvents.SolutionEvaluated, eventData);
     }
