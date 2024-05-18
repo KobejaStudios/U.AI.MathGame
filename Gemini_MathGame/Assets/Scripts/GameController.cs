@@ -10,7 +10,10 @@ public class GameController : MonoBehaviour
     public static GameController Instance;
     [SerializeField] private BubblesController _bubblesController;
     [SerializeField] private ScoreController _scoreController;
+    [SerializeField] private SolutionTargetController _solutionTargetController;
     [SerializeField] private TMP_InputField _inputField;
+    
+    public int SolutionTarget { get; set; }
 
     private void Awake()
     {
@@ -38,6 +41,12 @@ public class GameController : MonoBehaviour
         EventManager.RemoveListener(GameEvents.RoundStarted, RoundStart);
     }
 
+    public void SetSolution(int value)
+    {
+        SolutionTarget = value;
+        _solutionTargetController.UpdateText(value);
+    }
+
     private void RoundStart(Dictionary<string, object> context)
     {
         // spawn bubbles
@@ -53,13 +62,19 @@ public class GameController : MonoBehaviour
     private void SolutionEvaluated(Dictionary<string, object> context)
     {
         // if correct, increment score
-        var target = int.Parse(_inputField.text);
+        var target = SolutionTarget;
         var solution = (int)context["solution"];
+        var bubbles = context["bubbles"] as Queue<NumberBubble>;
 
         if (solution == target)
         {
             Debug.Log($"Good Job!");
             _scoreController.IncrementScore(5);
+            while (bubbles.Count > 0)
+            {
+                var current = bubbles.Dequeue();
+                current.gameObject.SetActive(false);
+            }
         }
         else
         {

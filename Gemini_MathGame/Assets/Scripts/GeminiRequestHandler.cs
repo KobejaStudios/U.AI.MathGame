@@ -11,7 +11,7 @@ public class GeminiRequestHandler : MonoBehaviour
     private readonly string _endpoint = 
         $"https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key={Secret.GEMINI_KEY}";
 
-    private async Task<string> AsyncGeminiRequest(string prompt)
+    public async Task<string> AsyncGeminiRequest(string prompt)
     {
         try
         {
@@ -22,6 +22,7 @@ public class GeminiRequestHandler : MonoBehaviour
             using var request = await client.PostAsync(_endpoint, content);
             var rawResponse = await request.Content.ReadAsStringAsync();
             var responseData = JsonConvert.DeserializeObject<GeminiResponse>(rawResponse);
+            Debug.Log($"raw: {rawResponse}");
         
             return responseData.Candidates[0].Content.Parts[0].Text;
         }
