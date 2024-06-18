@@ -2,9 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
+using Random = System.Random;
 
 public class BubblesController : MonoBehaviour
 {
@@ -59,7 +61,7 @@ public class BubblesController : MonoBehaviour
     private async void Init()
     {
         Debug.Log("Sending request from bubble controller");
-        var content = await _geminiRequestHandler.AsyncGeminiRequest(PromptBuilder(156));
+        var content = await _geminiRequestHandler.AsyncGeminiRequest(PromptBuilder(314));
         Debug.Log($"Received request from bubble controller: {content}");
 
         var data = ParseResponse(content);
@@ -77,10 +79,12 @@ public class BubblesController : MonoBehaviour
         var count = 0;
         if (nums != null)
         {
-            foreach (var n in nums)
+            var list = ShuffleValues(ParseJToken(nums));
+            
+            foreach (var n in list)
             {
                 _bubbles[count].gameObject.SetActive(true);
-                _bubbles[count].UpdateValue((int)n);
+                _bubbles[count].UpdateValue(n);
                 bubblesMap[_bubbles[count].Id] = _bubbles[count];
                 count++;
             }
@@ -91,10 +95,51 @@ public class BubblesController : MonoBehaviour
         }
     }
 
-    private string PromptBuilder(int target)
+    private IEnumerable<int> ParseJToken(JToken value)
+    {
+        var list = new List<int>();
+
+        foreach (var n in value)
+        {
+            list.Add((int)n);
+        }
+
+        return list;
+    }
+
+    private IEnumerable<int> ShuffleValues(IEnumerable<int> values)
+    {
+        var oldList = values.ToList();
+        var newList = new List<int>();
+
+        while (oldList.Count > 0)
+        {
+            var random = new Random();
+            var index = random.Next(0, oldList.Count - 1);
+            var current = oldList[index];
+            newList.Add(current);
+            oldList.RemoveAt(index);
+        }
+
+        return newList;
+    }
+
+    private string PromptBuilder(int target, int pairs = 21)
     {
         return
-            $"can you generate a json object named {target} with a value of 35 distinct random numbers. The numbers should be within a range of 0 - {target}. These will be used for a game where the user must select 2 numbers that sum to {target}";
+            $"Generate a JSON object named '{target}' with a value that's an array of {pairs * 2} random numbers between 0 and {target}.  Include some pairs within the array that sum up to {target}. The number of pairs should be between {PercentBuilder(0.5f, pairs)} and {PercentBuilder(0.8f, pairs)}.";
+    }
+    
+    private string ComplexPromptBuilder(int target, int pairs = 21)
+    {
+        return
+            $"Generate a JSON object named '{target}' with a value that's an array of {pairs * 2} random numbers between 0 and {target}.  Include some pairs within the array that sum up to {target}. The number of pairs should be between {PercentBuilder(0.5f, pairs)} and {PercentBuilder(0.8f, pairs)}." +
+            $"\n Additionally, generate a secondary JSON object named \"config\" with the following structure:\n\n```json\n{{\n  \"config\": {{\n    \"numValues\": 36,\n    \"numPairs\": 12, // This will be the number between {PercentBuilder(0.5f, pairs)} and {PercentBuilder(0.8f, pairs)} that you used for determining the number of correct pairs\n    \"correctPairs\": [\n      // List of pairs that sum up to 117\n    ]\n  }}\n}}";
+    }
+
+    private int PercentBuilder(float percent, int pairs)
+    {
+        return Mathf.FloorToInt(percent * pairs);
     }
 
     private JObject ParseResponse(string content)
@@ -105,19 +150,41 @@ public class BubblesController : MonoBehaviour
         return data;
     }
 
-    private void ProcessResponse(string response)
+    private Config ParseConfig(string jsonInput)
     {
+        var wrapper = JsonConvert.DeserializeObject<ConfigWrapper>(jsonInput);
+        var sb = new StringBuilder();
+        sb.AppendLine($"correct pairs: {wrapper.Config.NumPairs}");
+        foreach (var pair in wrapper.Config.CorrectPairs)
+        {
+            sb.AppendLine($"{pair[0]}, {pair[1]}");
+        }
         
+        Debug.Log(sb.ToString());
+        return wrapper.Config;
     }
-    
-    /*
-     * "128": {64, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49, 48, 47, 46, 45, 34,26,17
-}
-     */
     
     [System.Serializable]
     public class CandidateResponse
     {
         public int[] values;
+    }
+    
+    public class ConfigWrapper
+    {
+        [JsonProperty("config")]
+        public Config Config { get; set; }
+    }
+    
+    public class Config
+    {
+        [JsonProperty("numValues")]
+        public int NumValues { get; set; }
+    
+        [JsonProperty("numPairs")]
+        public int NumPairs { get; set; }
+    
+        [JsonProperty("correctPairs")]
+        public List<List<int>> CorrectPairs { get; set; }
     }
 }
