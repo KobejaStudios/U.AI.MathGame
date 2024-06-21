@@ -113,10 +113,7 @@ public class BubblesController : MonoBehaviour
             solution = VARIABLE.Key;
             nums = VARIABLE.Value;
         }
-
-        GameController.Instance.SetSolution(int.Parse(solution));
         
-        var count = 0;
         if (nums != null)
         {
             var list = ShuffleValues(ParseJToken(nums));
