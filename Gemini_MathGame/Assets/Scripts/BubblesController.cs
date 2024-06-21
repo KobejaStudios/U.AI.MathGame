@@ -119,7 +119,7 @@ public class BubblesController : MonoBehaviour
             var list = ShuffleValues(ParseJToken(nums));
             var enumerable = list as int[] ?? list.ToArray();
             var pairs = GetSolutionPairs(enumerable, int.Parse(solution));
-            Debug.Log($"Correct pairs: {pairs.Count}\ndata: {pairs.ToJsonPretty()}");
+            Debug.Log($"Correct pairs: {pairs.Count / 2}\ndata: {pairs.ToJsonPretty()}");
         }
         else
         {
@@ -127,9 +127,9 @@ public class BubblesController : MonoBehaviour
         }
     }
 
-    private HashSet<Tuple<int, int>> GetSolutionPairs(IEnumerable<int> input, int solutionTarget)
+    private HashSet<int> GetSolutionPairs(IEnumerable<int> input, int solutionTarget)
     {
-        var value = new HashSet<Tuple<int, int>>();
+        var result = new HashSet<int>();
         var data = input.ToHashSet();
         while (data.Count > 0)
         {
@@ -139,11 +139,12 @@ public class BubblesController : MonoBehaviour
             if (data.Contains(target))
             {
                 data.Remove(target);
-                value.Add(new Tuple<int, int>(current, target));
+                result.Add(current);
+                result.Add(target);
             }
         }
 
-        return value;
+        return result;
     }
 
     private bool IsMatch(int x, int y)
