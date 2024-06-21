@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 public class GeminiRequestHandler : MonoBehaviour
 {
     private readonly string _endpoint = 
-        $"https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key={Secret.GEMINI_KEY}";
+        $"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={Secret.GEMINI_KEY}";
 
     public async Task<string> AsyncGeminiRequest(string prompt)
     {

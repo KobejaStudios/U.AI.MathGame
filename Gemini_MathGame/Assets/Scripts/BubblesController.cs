@@ -62,7 +62,7 @@ public class BubblesController : MonoBehaviour
     {
         Debug.Log("Sending request from bubble controller");
         var content = await _geminiRequestHandler.AsyncGeminiRequest(PromptBuilder(314));
-        Debug.Log($"Received request from bubble controller: {content}");
+        Debug.Log($"Received request from bubble controller");
 
         var data = ParseResponse(content);
         var solution = "";
@@ -80,8 +80,11 @@ public class BubblesController : MonoBehaviour
         if (nums != null)
         {
             var list = ShuffleValues(ParseJToken(nums));
+            var enumerable = list as int[] ?? list.ToArray();
+            var pairs = GetSolutionPairs(enumerable, int.Parse(solution));
+            Debug.Log($"Correct pairs: {pairs.Count}\ndata: {pairs}");
             
-            foreach (var n in list)
+            foreach (var n in enumerable)
             {
                 _bubbles[count].gameObject.SetActive(true);
                 _bubbles[count].UpdateValue(n);
@@ -93,6 +96,30 @@ public class BubblesController : MonoBehaviour
         {
             Debug.LogError($"nums is null!!");
         }
+    }
+
+    private HashSet<Tuple<int, int>> GetSolutionPairs(IEnumerable<int> input, int solutionTarget)
+    {
+        var value = new HashSet<Tuple<int, int>>();
+        var data = input.ToHashSet();
+        while (data.Count > 0)
+        {
+            var current = data.Last();
+            data.Remove(current);
+            var target = solutionTarget - current;
+            if (data.Contains(target))
+            {
+                data.Remove(target);
+                value.Add(new Tuple<int, int>(current, target));
+            }
+        }
+
+        return value;
+    }
+
+    private bool IsMatch(int x, int y)
+    {
+        return x == y;
     }
 
     private IEnumerable<int> ParseJToken(JToken value)
@@ -127,7 +154,8 @@ public class BubblesController : MonoBehaviour
     private string PromptBuilder(int target, int pairs = 21)
     {
         return
-            $"Generate a JSON object named '{target}' with a value that's an array of {pairs * 2} random numbers between 0 and {target}.  Include some pairs within the array that sum up to {target}. The number of pairs should be between {PercentBuilder(0.5f, pairs)} and {PercentBuilder(0.8f, pairs)}.";
+            $"Generate a JSON object named '{target}' with a value that's an array of {pairs * 2} random numbers between 0 and {target}.  Include some pairs within the array that sum up to {target}. The number of pairs should be between {PercentBuilder(0.5f, pairs)} and {PercentBuilder(0.8f, pairs)}." +
+            $"I only want the JSON object";
     }
     
     private string ComplexPromptBuilder(int target, int pairs = 21)
