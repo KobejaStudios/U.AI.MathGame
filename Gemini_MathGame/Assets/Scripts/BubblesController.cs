@@ -182,10 +182,12 @@ public class BubblesController : MonoBehaviour
 
     private string PromptBuilder(int target, int pairs = 21)
     {
-        var value = $"Generate a JSON object named '{target}' with a value that's an array of {pairs * 2} numbers between 0 and {target} where {PercentBuilder(pairs)} distinct number pairs within the array sum up to {target} and the remaining numbers are random within the range of 0 - {target}" +
+        var value1 = $"Generate a JSON object named '{target}' with a value that's an array of {pairs * 2} numbers between 0 and {target} where {PercentBuilder(pairs)} distinct number pairs within the array sum up to {target} and the remaining numbers are random within the range of 0 - {target}" +
                     $" I only want the JSON object";
-        Debug.Log($"Prompt: {value}");
-        return value;
+        var value2 = $"Generate a JSON object named '{target}' with a value that's an array of {pairs * 2} numbers between 0 and {target}. Within this array of numbers I want {PercentBuilder(pairs)} distinct number pairs that sum up to {target} and the remaining numbers are random within the range of 0 - {target}" +
+                    $" I only want the JSON object";
+        Debug.Log($"Prompt: {value1}");
+        return value1;
 
     }
     
