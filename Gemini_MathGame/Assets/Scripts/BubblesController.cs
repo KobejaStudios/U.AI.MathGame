@@ -82,7 +82,7 @@ public class BubblesController : MonoBehaviour
             var list = ShuffleValues(ParseJToken(nums));
             var enumerable = list as int[] ?? list.ToArray();
             var pairs = GetSolutionPairs(enumerable, int.Parse(solution));
-            Debug.Log($"Correct pairs: {pairs.Count}\ndata: {pairs}");
+            Debug.Log($"Correct pairs: {pairs.Count}\ndata: {pairs.ToJsonPretty()}");
             
             foreach (var n in enumerable)
             {
@@ -91,6 +91,38 @@ public class BubblesController : MonoBehaviour
                 bubblesMap[_bubbles[count].Id] = _bubbles[count];
                 count++;
             }
+        }
+        else
+        {
+            Debug.LogError($"nums is null!!");
+        }
+    }
+
+    public async void TestApiRequest()
+    {
+        Debug.Log("Sending request from bubble controller");
+        var content = await _geminiRequestHandler.AsyncGeminiRequest(PromptBuilder(314));
+        Debug.Log($"Received request from bubble controller");
+
+        var data = ParseResponse(content);
+        var solution = "";
+        JToken nums = null;
+
+        foreach (var VARIABLE in data)
+        {
+            solution = VARIABLE.Key;
+            nums = VARIABLE.Value;
+        }
+
+        GameController.Instance.SetSolution(int.Parse(solution));
+        
+        var count = 0;
+        if (nums != null)
+        {
+            var list = ShuffleValues(ParseJToken(nums));
+            var enumerable = list as int[] ?? list.ToArray();
+            var pairs = GetSolutionPairs(enumerable, int.Parse(solution));
+            Debug.Log($"Correct pairs: {pairs.Count}\ndata: {pairs.ToJsonPretty()}");
         }
         else
         {
@@ -136,7 +168,7 @@ public class BubblesController : MonoBehaviour
 
     private IEnumerable<int> ShuffleValues(IEnumerable<int> values)
     {
-        var oldList = values.ToList();
+        var oldList = values.ToHashSet().ToList();
         var newList = new List<int>();
 
         while (oldList.Count > 0)
@@ -153,21 +185,27 @@ public class BubblesController : MonoBehaviour
 
     private string PromptBuilder(int target, int pairs = 21)
     {
-        return
-            $"Generate a JSON object named '{target}' with a value that's an array of {pairs * 2} random numbers between 0 and {target}.  Include some pairs within the array that sum up to {target}. The number of pairs should be between {PercentBuilder(0.5f, pairs)} and {PercentBuilder(0.8f, pairs)}." +
-            $"I only want the JSON object";
+        var value = $"Generate a JSON object named '{target}' with a value that's an array of {pairs * 2} numbers between 0 and {target} where {PercentBuilder(pairs)} distinct number pairs within the array sum up to {target} and the remaining numbers are random within the range of 0 - {target}" +
+                    $" I only want the JSON object";
+        Debug.Log($"Prompt: {value}");
+        return value;
+
     }
     
     private string ComplexPromptBuilder(int target, int pairs = 21)
     {
         return
-            $"Generate a JSON object named '{target}' with a value that's an array of {pairs * 2} random numbers between 0 and {target}.  Include some pairs within the array that sum up to {target}. The number of pairs should be between {PercentBuilder(0.5f, pairs)} and {PercentBuilder(0.8f, pairs)}." +
-            $"\n Additionally, generate a secondary JSON object named \"config\" with the following structure:\n\n```json\n{{\n  \"config\": {{\n    \"numValues\": 36,\n    \"numPairs\": 12, // This will be the number between {PercentBuilder(0.5f, pairs)} and {PercentBuilder(0.8f, pairs)} that you used for determining the number of correct pairs\n    \"correctPairs\": [\n      // List of pairs that sum up to 117\n    ]\n  }}\n}}";
+            $"Generate a JSON object named '{target}' with a value that's an array of {pairs * 2} random numbers between 0 and {target}.  Include some pairs within the array that sum up to {target}. The number of pairs should be between {PercentBuilder(pairs)} and {PercentBuilder(pairs)}." +
+            $"\n Additionally, generate a secondary JSON object named \"config\" with the following structure:\n\n```json\n{{\n  \"config\": {{\n    \"numValues\": 36,\n    \"numPairs\": 12, // This will be the number between {PercentBuilder(pairs)} and {PercentBuilder(pairs)} that you used for determining the number of correct pairs\n    \"correctPairs\": [\n      // List of pairs that sum up to 117\n    ]\n  }}\n}}";
     }
 
-    private int PercentBuilder(float percent, int pairs)
+    private int PercentBuilder(int pairs)
     {
-        return Mathf.FloorToInt(percent * pairs);
+        var input = UnityEngine.Random.Range(0.5f, 0.8f);
+        var rand = UnityEngine.Random.Range(input, Math.Min(input * 1.5f, 0.9f));
+        var value = Mathf.FloorToInt(rand * pairs);
+        Debug.Log($"correct pairs target: {value}, total pairs: {pairs}");
+        return value;
     }
 
     private JObject ParseResponse(string content)
