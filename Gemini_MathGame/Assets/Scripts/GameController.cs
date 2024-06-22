@@ -44,7 +44,12 @@ public class GameController : MonoBehaviour
     public void SetSolution(int value)
     {
         SolutionTarget = value;
-        _solutionTargetController.UpdateText(value);
+        EventManager.RaiseEvent(GameEvents.SolutionDefined,
+            new Dictionary<string, object> 
+            {
+                ["solution"] = value
+            }
+        );
     }
 
     private void RoundStart(Dictionary<string, object> context)

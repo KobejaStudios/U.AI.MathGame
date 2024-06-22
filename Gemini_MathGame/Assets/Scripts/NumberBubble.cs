@@ -25,6 +25,11 @@ public class NumberBubble : MonoBehaviour
         _button.onClick.AddListener(OnClick);
     }
 
+    private void Start()
+    {
+        gameObject.SetActive(false);
+    }
+
     private void OnClick()
     {
         _startingPosition = this.Transform.position;
