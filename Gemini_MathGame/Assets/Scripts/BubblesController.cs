@@ -77,12 +77,12 @@ public class BubblesController : MonoBehaviour
         {
             var list = ShuffleValues(ParseJToken(nums));
             var enumerable = list as int[] ?? list.ToArray();
-            var pairs = GetSolutionPairs(enumerable, int.Parse(solution));
+            var solutionNumbers = GetSolutionNumbers(enumerable, int.Parse(solution));
             EventManager.RaiseEvent(GameEvents.PairsGoalDefined, new Dictionary<string, object>
             {
-                ["pairsGoal"] = pairs.Count / 2
+                ["pairsGoal"] = solutionNumbers.Count / 2
             });
-            Debug.Log($"Correct pairs: {pairs.Count / 2}\ndata: {pairs.ToJsonPretty()}");
+            Debug.Log($"Correct pairs: {solutionNumbers.Count / 2}\ndata: {solutionNumbers.ToJsonPretty()}");
             
             foreach (var n in enumerable)
             {
@@ -118,7 +118,7 @@ public class BubblesController : MonoBehaviour
         {
             var list = ShuffleValues(ParseJToken(nums));
             var enumerable = list as int[] ?? list.ToArray();
-            var pairs = GetSolutionPairs(enumerable, int.Parse(solution));
+            var pairs = GetSolutionNumbers(enumerable, int.Parse(solution));
             Debug.Log($"Correct pairs: {pairs.Count / 2}\ndata: {pairs.ToJsonPretty()}");
         }
         else
@@ -127,7 +127,7 @@ public class BubblesController : MonoBehaviour
         }
     }
 
-    private HashSet<int> GetSolutionPairs(IEnumerable<int> input, int solutionTarget)
+    private HashSet<int> GetSolutionNumbers(IEnumerable<int> input, int solutionTarget)
     {
         var result = new HashSet<int>();
         var data = input.ToHashSet();
