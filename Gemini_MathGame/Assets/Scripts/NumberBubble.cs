@@ -33,6 +33,7 @@ public class NumberBubble : MonoBehaviour
             ["id"] = Id,
             ["data"] = this
         };
+        _image.color = Color.yellow;
         EventManager.RaiseEvent(GameEvents.NumberBoxClicked, eventData);
         EventManager.RaiseEvent(GameEvents.BubbleClicked, eventData);
     }

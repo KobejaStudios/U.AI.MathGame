@@ -15,11 +15,6 @@ public class BubblesController : MonoBehaviour
     private Queue<NumberBubble> _bubblesQueue = new();
     [SerializeField] private GeminiRequestHandler _geminiRequestHandler;
 
-    private void Awake()
-    {
-        
-    }
-
     private void Start()
     {
         EventManager.AddListener(GameEvents.BubbleClicked, OnBubbleClicked);
@@ -35,6 +30,7 @@ public class BubblesController : MonoBehaviour
         while (_bubblesQueue.Count > 0)
         {
             var current = _bubblesQueue.Dequeue();
+            current.Image.color = Color.white;
             solution += current.Value;
             Debug.Log($"value: {current.Value} added to sum giving: {solution}");
         }
@@ -82,13 +78,13 @@ public class BubblesController : MonoBehaviour
             var list = ShuffleValues(ParseJToken(nums));
             var enumerable = list as int[] ?? list.ToArray();
             var pairs = GetSolutionPairs(enumerable, int.Parse(solution));
-            Debug.Log($"Correct pairs: {pairs.Count}\ndata: {pairs.ToJsonPretty()}");
+            Debug.Log($"Correct pairs: {pairs.Count / 2}\ndata: {pairs.ToJsonPretty()}");
             
             foreach (var n in enumerable)
             {
                 _bubbles[count].gameObject.SetActive(true);
                 _bubbles[count].UpdateValue(n);
-                bubblesMap[_bubbles[count].Id] = _bubbles[count];
+                bubblesMap[_bubbles[count].Value] = _bubbles[count];
                 count++;
             }
         }
@@ -147,11 +143,6 @@ public class BubblesController : MonoBehaviour
         return result;
     }
 
-    private bool IsMatch(int x, int y)
-    {
-        return x == y;
-    }
-
     private IEnumerable<int> ParseJToken(JToken value)
     {
         var list = new List<int>();
@@ -185,8 +176,8 @@ public class BubblesController : MonoBehaviour
     {
         var value1 = $"Generate a JSON object named '{target}' with a value that's an array of {pairs * 2} numbers between 0 and {target} where {PercentBuilder(pairs)} distinct number pairs within the array sum up to {target} and the remaining numbers are random within the range of 0 - {target}" +
                     $" I only want the JSON object";
-        var value2 = $"Generate a JSON object named '{target}' with a value that's an array of {pairs * 2} numbers between 0 and {target}. Within this array of numbers I want {PercentBuilder(pairs)} distinct number pairs that sum up to {target} and the remaining numbers are random within the range of 0 - {target}" +
-                    $" I only want the JSON object";
+        // var value2 = $"Generate a JSON object named '{target}' with a value that's an array of {pairs * 2} numbers between 0 and {target}. Within this array of numbers I want {PercentBuilder(pairs)} distinct number pairs that sum up to {target} and the remaining numbers are random within the range of 0 - {target}" +
+        //            $" I only want the JSON object";
         Debug.Log($"Prompt: {value1}");
         return value1;
 
@@ -214,43 +205,5 @@ public class BubblesController : MonoBehaviour
         Debug.Log($"cleaned json: {content}");
         var data = JObject.Parse(content);
         return data;
-    }
-
-    private Config ParseConfig(string jsonInput)
-    {
-        var wrapper = JsonConvert.DeserializeObject<ConfigWrapper>(jsonInput);
-        var sb = new StringBuilder();
-        sb.AppendLine($"correct pairs: {wrapper.Config.NumPairs}");
-        foreach (var pair in wrapper.Config.CorrectPairs)
-        {
-            sb.AppendLine($"{pair[0]}, {pair[1]}");
-        }
-        
-        Debug.Log(sb.ToString());
-        return wrapper.Config;
-    }
-    
-    [System.Serializable]
-    public class CandidateResponse
-    {
-        public int[] values;
-    }
-    
-    public class ConfigWrapper
-    {
-        [JsonProperty("config")]
-        public Config Config { get; set; }
-    }
-    
-    public class Config
-    {
-        [JsonProperty("numValues")]
-        public int NumValues { get; set; }
-    
-        [JsonProperty("numPairs")]
-        public int NumPairs { get; set; }
-    
-        [JsonProperty("correctPairs")]
-        public List<List<int>> CorrectPairs { get; set; }
     }
 }

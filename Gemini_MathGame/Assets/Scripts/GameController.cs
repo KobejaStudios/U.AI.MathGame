@@ -69,7 +69,7 @@ public class GameController : MonoBehaviour
         if (solution == target)
         {
             Debug.Log($"Good Job!");
-            _scoreController.IncrementScore(5);
+            _scoreController.IncrementScore(1);
             while (bubbles.Count > 0)
             {
                 var current = bubbles.Dequeue();
@@ -80,6 +80,11 @@ public class GameController : MonoBehaviour
         {
             Debug.Log("Failed");
         }
+    }
+
+    public Dictionary<int, NumberBubble> GetBubblesMap()
+    {
+        return _bubblesController.bubblesMap;
     }
     
     private void RoundOver(Dictionary<string, object> context)
