@@ -32,6 +32,7 @@ public class GameController : MonoBehaviour
         EventManager.AddListener(GameEvents.BubbleClicked, BubbleClicked);
         EventManager.AddListener(GameEvents.SolutionEvaluated, SolutionEvaluated);
         EventManager.AddListener(GameEvents.RoundStarted, RoundStart);
+        EventManager.AddListener(GameEvents.ScoreAdded, OnScoreAdded);
     }
 
     private void OnDestroy()
@@ -39,6 +40,7 @@ public class GameController : MonoBehaviour
         EventManager.RemoveListener(GameEvents.BubbleClicked, BubbleClicked);
         EventManager.RemoveListener(GameEvents.SolutionEvaluated, SolutionEvaluated);
         EventManager.RemoveListener(GameEvents.RoundStarted, RoundStart);
+        EventManager.RemoveListener(GameEvents.ScoreAdded, OnScoreAdded);
     }
 
     public void SetSolution(int value)
@@ -64,6 +66,18 @@ public class GameController : MonoBehaviour
         // if solution reached, fire "SolutionEvaluated"
     }
     
+    private void OnScoreAdded(Dictionary<string, object> arg0)
+    {
+        if (arg0.TryGetAs("currentScore", out int currentScore) &&
+            arg0.TryGetAs("pairsGoal", out int pairsGoal))
+        {
+            if (currentScore == pairsGoal)
+            {
+                Debug.Log("Winner!");
+            }
+        }
+    }
+    
     private void SolutionEvaluated(Dictionary<string, object> context)
     {
         // if correct, increment score
@@ -73,8 +87,9 @@ public class GameController : MonoBehaviour
 
         if (solution == target)
         {
+            EventManager.RaiseEvent(GameEvents.CorrectSolution, context);
             Debug.Log($"Good Job!");
-            _scoreController.IncrementScore(1);
+            // TODO: move this logic elsewhere? perhaps a bubbles manager?
             while (bubbles.Count > 0)
             {
                 var current = bubbles.Dequeue();

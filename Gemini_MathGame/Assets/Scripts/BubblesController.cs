@@ -78,6 +78,10 @@ public class BubblesController : MonoBehaviour
             var list = ShuffleValues(ParseJToken(nums));
             var enumerable = list as int[] ?? list.ToArray();
             var pairs = GetSolutionPairs(enumerable, int.Parse(solution));
+            EventManager.RaiseEvent(GameEvents.PairsGoalDefined, new Dictionary<string, object>
+            {
+                ["pairsGoal"] = pairs.Count / 2
+            });
             Debug.Log($"Correct pairs: {pairs.Count / 2}\ndata: {pairs.ToJsonPretty()}");
             
             foreach (var n in enumerable)

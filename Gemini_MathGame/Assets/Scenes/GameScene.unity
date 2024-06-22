@@ -696,7 +696,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1278948005}
+  m_Father: {fileID: 354635137}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1417,6 +1417,7 @@ GameObject:
   - component: {fileID: 354635137}
   - component: {fileID: 354635139}
   - component: {fileID: 354635138}
+  - component: {fileID: 354635140}
   m_Layer: 5
   m_Name: progressBarBackground
   m_TagString: Untagged
@@ -1435,7 +1436,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 150979972}
   m_Father: {fileID: 1278948005}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -1463,8 +1465,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Type: 3
+  m_Sprite: {fileID: 21300000, guid: 9f3f47cd9a8e8b444aa2eda7a9ba6c9b, type: 3}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 1
@@ -1481,6 +1483,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 354635136}
   m_CullTransparentMesh: 1
+--- !u!114 &354635140
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 354635136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31a19414c41e5ae4aae2af33fee712f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ShowMaskGraphic: 1
 --- !u!1 &357239366
 GameObject:
   m_ObjectHideFlags: 0
@@ -5428,7 +5443,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 354635137}
-  - {fileID: 150979972}
   m_Father: {fileID: 2055703770}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
@@ -8463,13 +8477,35 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5232467133131937398, guid: 9bb59c3efc344324a92a62eb03496eb3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1278948005}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 259211636202997267, guid: 9bb59c3efc344324a92a62eb03496eb3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2055703772}
   m_SourcePrefab: {fileID: 100100000, guid: 9bb59c3efc344324a92a62eb03496eb3, type: 3}
 --- !u!224 &2055703770 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5232467133131937398, guid: 9bb59c3efc344324a92a62eb03496eb3, type: 3}
   m_PrefabInstance: {fileID: 2055703769}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2055703771 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 259211636202997267, guid: 9bb59c3efc344324a92a62eb03496eb3, type: 3}
+  m_PrefabInstance: {fileID: 2055703769}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2055703772
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2055703771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 679d04090c3753f45aea5db2b1f935da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _text: {fileID: 638019798}
+  _progressBarFill: {fileID: 150979973}
 --- !u!114 &2083549028 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2142418652345294943, guid: d7db33639e86ffc40b06bde405de5407, type: 3}
