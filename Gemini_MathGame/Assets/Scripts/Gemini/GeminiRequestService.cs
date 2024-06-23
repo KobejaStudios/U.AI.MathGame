@@ -6,12 +6,17 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Newtonsoft.Json;
 
-public static class GeminiRequestService
+public interface IGeminiRequestService
 {
-    private static string _endpoint = 
+    UniTask<string> AsyncGeminiRequest(string prompt);
+}
+
+public class GeminiRequestService : IGeminiRequestService
+{
+    private readonly string _endpoint = 
         $"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={Secret.GEMINI_KEY}";
 
-    public static async UniTask<string> AsyncGeminiRequest(string prompt)
+    public async UniTask<string> AsyncGeminiRequest(string prompt)
     {
         return await UniTask.RunOnThreadPool(async () =>
         {

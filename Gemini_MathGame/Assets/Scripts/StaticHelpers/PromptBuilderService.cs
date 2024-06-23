@@ -1,11 +1,15 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public static class PromptBuilderService
+public interface IPromptBuilderService
 {
-    public static string BuildPromptSimple(int target, int pairs = 20)
+    string BuildPromptSimple(int target, int pairs = 20);
+    string BuildPromptComplex(int target, int pairs = 21);
+}
+
+public class PromptBuilderService : IPromptBuilderService
+{
+    public string BuildPromptSimple(int target, int pairs = 20)
     {
         // var value1 = $"Generate a JSON object named '{target}' with a value that's an array of {pairs * 2} numbers between 0 and {target}. I want to be able to  {PercentBuilder(pairs)} distinct number pairs within the array sum up to {target} and the remaining numbers are random within the range of 0 - {target}" +
         //            $" I only want the JSON object";
@@ -19,7 +23,7 @@ public static class PromptBuilderService
 
     }
     
-    public static string BuildPromptComplex(int target, int pairs = 21)
+    public string BuildPromptComplex(int target, int pairs = 21)
     {
         return
             $"Generate a JSON object named '{target}' with a value that's an array of {pairs * 2} random numbers between 0 and {target}.  Include some pairs within the array that sum up to {target}. The number of pairs should be between {BuildCorrectPairsTarget(pairs)} and {BuildCorrectPairsTarget(pairs)}." +

@@ -65,7 +65,8 @@ public class GameController : MonoBehaviour
         _scoreProgressController.ResetController();
         _solutionTargetController.ResetController();
         await _bubblesController.ResetBubblesViewAsync();
-        var content = await GeminiRequestService.AsyncGeminiRequest(PromptBuilderService.BuildPromptSimple(314));
+        var prompt = ServiceLocator.Get<IPromptBuilderService>().BuildPromptSimple(314);
+        var content = await ServiceLocator.Get<IGeminiRequestService>().AsyncGeminiRequest(prompt);
         _solutionNumbers = await _bubblesController.SpawnBubblesAsync(content);
         Debug.Log($"done awaiting");
         EventManager.RaiseEvent(GameEvents.RoundStarted);

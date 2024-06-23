@@ -189,7 +189,8 @@ public class BubblesController : MonoBehaviour
     public async void TestApiRequest()
     {
         Debug.Log("Sending request from bubble controller");
-        var content = await GeminiRequestService.AsyncGeminiRequest(PromptBuilderService.BuildPromptSimple(314));
+        var prompt = ServiceLocator.Get<IPromptBuilderService>().BuildPromptSimple(314);
+        var content = await ServiceLocator.Get<IGeminiRequestService>().AsyncGeminiRequest(prompt);
         Debug.Log($"Received request from bubble controller");
 
         var data = ParseResponse(content);
