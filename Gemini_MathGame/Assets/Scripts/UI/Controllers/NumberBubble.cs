@@ -10,6 +10,8 @@ public class NumberBubble : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _text;
     [SerializeField] private Image _image;
     [SerializeField] private Button _button;
+
+    [SerializeField] private Sprite[] _spriteSheet;
     
     public TextMeshProUGUI Text => _text;
     public Image Image => _image;
@@ -68,6 +70,11 @@ public class NumberBubble : MonoBehaviour
         Image.color = Color.white;
         _text.text = Value.ToString();
         gameObject.SetActive(false);
+    }
+
+    public void AnimationBubblePop()
+    {
+        
     }
 }
 

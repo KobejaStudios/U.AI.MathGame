@@ -197,6 +197,14 @@ MonoBehaviour:
   _text: {fileID: 4509726248482561143}
   _image: {fileID: 4640045621160539778}
   _button: {fileID: 1075127623941359811}
+  _spriteSheet:
+  - {fileID: 50850444, guid: ab76ddddf2e15f047807d1f157b21a78, type: 3}
+  - {fileID: 480774240, guid: ab76ddddf2e15f047807d1f157b21a78, type: 3}
+  - {fileID: 963492977, guid: ab76ddddf2e15f047807d1f157b21a78, type: 3}
+  - {fileID: 443237570, guid: ab76ddddf2e15f047807d1f157b21a78, type: 3}
+  - {fileID: -1845538278, guid: ab76ddddf2e15f047807d1f157b21a78, type: 3}
+  - {fileID: -1627241694, guid: ab76ddddf2e15f047807d1f157b21a78, type: 3}
+  - {fileID: -361846102, guid: ab76ddddf2e15f047807d1f157b21a78, type: 3}
 --- !u!114 &1075127623941359811
 MonoBehaviour:
   m_ObjectHideFlags: 0
