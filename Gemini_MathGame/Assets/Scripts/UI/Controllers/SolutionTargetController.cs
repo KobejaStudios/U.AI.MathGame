@@ -97,6 +97,7 @@ public class SolutionTargetController : MonoBehaviour
                 break;
             case EquationStringState.TwoSlotsFilled:
                 _cts.Cancel();
+                _cts = new CancellationTokenSource();
                 _firstSlot = input.ToString();
                 _solutionTargetText.text = $"<u>{input}</u> + ___ = {_solutionTarget}";
                 _equationStringState = EquationStringState.OneSlotFilled;
@@ -109,10 +110,9 @@ public class SolutionTargetController : MonoBehaviour
 
     private async UniTask AnimationStub(CancellationToken ct)
     {
-        // TODO: this is still broken, really need to clean up this whole string manipulation
         try
         {
-            await UniTask.Delay(100, cancellationToken: ct);
+            await UniTask.Delay(1000, cancellationToken: ct);
             ResetEquationStringAndState();
             Debug.Log($"Animation awaiter was not canceled");
         }
