@@ -27,6 +27,12 @@ public class ScoreProgressController : MonoBehaviour
         EventManager.RemoveListener(GameEvents.PairsGoalDefined, OnPairsGoalDefined);
     }
 
+    public void ResetController()
+    {
+        _text.text = "0 / 0";
+        _progressBarFill.fillAmount = 0f;
+    }
+
     private void InitUI()
     {
         UpdateText();

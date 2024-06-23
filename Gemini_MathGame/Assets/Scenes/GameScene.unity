@@ -1661,6 +1661,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _bubblesController: {fileID: 393822472}
   _solutionTargetController: {fileID: 521720581}
+  _hourglassController: {fileID: 1708527732}
+  _scoreProgressController: {fileID: 2055703772}
   _inputField: {fileID: 1835299737}
 --- !u!4 &357239368
 Transform:

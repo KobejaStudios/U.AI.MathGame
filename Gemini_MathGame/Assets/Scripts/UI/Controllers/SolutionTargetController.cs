@@ -31,6 +31,16 @@ public class SolutionTargetController : MonoBehaviour
         EventManager.RemoveListener(GameEvents.RoundWon, OnRoundWon);
         EventManager.RemoveListener(GameEvents.RoundLost, OnRoundLost);
     }
+
+    public void ResetController()
+    {
+        _cts.Cancel();
+        _cts = new CancellationTokenSource();
+        _solutionTargetText.text = "";
+        _equationStringState = EquationStringState.Empty;
+        _firstSlot = "";
+        _secondSlot = "";
+    }
     
     private void OnRoundLost(Dictionary<string, object> arg0)
     {

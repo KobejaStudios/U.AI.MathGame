@@ -24,6 +24,15 @@ public class HourglassController : MonoBehaviour
         EventManager.RemoveListener(GameEvents.ScoreGoalReached, OnScoreGoalReached);
     }
 
+    public void ResetController()
+    {
+        _cts.Cancel();
+        _cts = new CancellationTokenSource();
+        _time = TimeSpan.FromSeconds(_timerSeconds);
+        _timerText.text = _time.ToString(@"mm\:ss");
+        _goalReached = false;
+    }
+
     private void OnScoreGoalReached(Dictionary<string, object> arg0)
     {
         _cts?.Cancel();

@@ -10,6 +10,8 @@ public class GameController : MonoBehaviour
     public static GameController Instance;
     [SerializeField] private BubblesController _bubblesController;
     [SerializeField] private SolutionTargetController _solutionTargetController;
+    [SerializeField] private HourglassController _hourglassController;
+    [SerializeField] private ScoreProgressController _scoreProgressController;
     [SerializeField] private TMP_InputField _inputField;
 
     private HashSet<int> _solutionNumbers = new();
@@ -59,6 +61,9 @@ public class GameController : MonoBehaviour
 
     public async void StartRound()
     {
+        _hourglassController.ResetController();
+        _scoreProgressController.ResetController();
+        _solutionTargetController.ResetController();
         await _bubblesController.ResetBubblesViewAsync();
         var content = await GeminiRequestService.AsyncGeminiRequest(PromptBuilderService.BuildPromptSimple(314));
         _solutionNumbers = await _bubblesController.SpawnBubblesAsync(content);
