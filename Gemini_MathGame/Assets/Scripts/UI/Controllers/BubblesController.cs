@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -11,39 +12,29 @@ using Random = System.Random;
 public class BubblesController : MonoBehaviour
 {
     [SerializeField] private NumberBubble[] _bubbles;
-    public Dictionary<int, NumberBubble> bubblesMap = new();
+
+    public Dictionary<int, NumberBubble> BubblesMap { get; } = new();
     private Queue<NumberBubble> _bubblesQueue = new();
     private HashSet<int> _solutionNumbers = new();
-    [SerializeField] private GeminiRequestHandler _geminiRequestHandler;
+
+    #region UnityLifecycle
 
     private void Start()
     {
         EventManager.AddListener(GameEvents.BubbleClicked, OnBubbleClicked);
         EventManager.AddListener(GameEvents.EvaluateSolution, OnEvaluateSolution);
-        EventManager.AddListener(GameEvents.TimeExpired, OnTimeExpired);
-        
-        Init();
     }
 
     private void OnDestroy()
     {
         EventManager.RemoveListener(GameEvents.BubbleClicked, OnBubbleClicked);
         EventManager.RemoveListener(GameEvents.EvaluateSolution, OnEvaluateSolution);
-        EventManager.RemoveListener(GameEvents.TimeExpired, OnTimeExpired);
     }
 
-    private void OnTimeExpired(Dictionary<string, object> arg0)
-    {
-        foreach (var bubble in _solutionNumbers)
-        {
-            var current = GameController.Instance.GetBubblesMap()[bubble];
-            if (current.gameObject.activeInHierarchy)
-            {
-                current.Image.color = Color.green;
-            }
-        }
-    }
-
+    #endregion
+    
+    #region Internal
+    
     private void OnEvaluateSolution(Dictionary<string, object> arg0)
     {
         var solution = 0;
@@ -75,20 +66,24 @@ public class BubblesController : MonoBehaviour
         }
     }
 
-    private async void Init()
+    private void ResetBubblesView()
     {
-        Debug.Log("Sending request from bubble controller");
-        var content = await _geminiRequestHandler.AsyncGeminiRequest(PromptBuilder(314));
-        Debug.Log($"Received request from bubble controller");
-
+        foreach (var bubble in _bubbles)
+        {
+            bubble.ResetBubble();
+        }
+    }
+    
+    private HashSet<int> SpawnBubbles(string content)
+    {
         var data = ParseResponse(content);
         var solution = "";
         JToken nums = null;
 
-        foreach (var VARIABLE in data)
+        foreach (var kvp in data)
         {
-            solution = VARIABLE.Key;
-            nums = VARIABLE.Value;
+            solution = kvp.Key;
+            nums = kvp.Value;
         }
 
         GameController.Instance.SetSolution(int.Parse(solution));
@@ -109,46 +104,18 @@ public class BubblesController : MonoBehaviour
             {
                 _bubbles[count].gameObject.SetActive(true);
                 _bubbles[count].UpdateValue(n);
-                bubblesMap[_bubbles[count].Value] = _bubbles[count];
+                BubblesMap[_bubbles[count].Value] = _bubbles[count];
                 count++;
             }
-            EventManager.RaiseEvent(GameEvents.RoundStarted);
         }
         else
         {
             Debug.LogError($"nums is null!!");
         }
+
+        return _solutionNumbers;
     }
-
-    public async void TestApiRequest()
-    {
-        Debug.Log("Sending request from bubble controller");
-        var content = await _geminiRequestHandler.AsyncGeminiRequest(PromptBuilder(314));
-        Debug.Log($"Received request from bubble controller");
-
-        var data = ParseResponse(content);
-        var solution = "";
-        JToken nums = null;
-
-        foreach (var VARIABLE in data)
-        {
-            solution = VARIABLE.Key;
-            nums = VARIABLE.Value;
-        }
-        
-        if (nums != null)
-        {
-            var list = ShuffleValues(ParseJToken(nums));
-            var enumerable = list as int[] ?? list.ToArray();
-            var pairs = GetSolutionNumbers(enumerable, int.Parse(solution));
-            Debug.Log($"Correct pairs: {pairs.Count / 2}\ndata: {pairs.ToJsonPretty()}");
-        }
-        else
-        {
-            Debug.LogError($"nums is null!!");
-        }
-    }
-
+    
     private HashSet<int> GetSolutionNumbers(IEnumerable<int> input, int solutionTarget)
     {
         var result = new HashSet<int>();
@@ -198,41 +165,53 @@ public class BubblesController : MonoBehaviour
         return newList;
     }
 
-    private string PromptBuilder(int target, int pairs = 20)
-    {
-        // var value1 = $"Generate a JSON object named '{target}' with a value that's an array of {pairs * 2} numbers between 0 and {target}. I want to be able to  {PercentBuilder(pairs)} distinct number pairs within the array sum up to {target} and the remaining numbers are random within the range of 0 - {target}" +
-        //            $" I only want the JSON object";
-        // var value2 = $"Generate a JSON object named '{target}' with a value that's an array of {pairs * 2} numbers between 0 and {target}. Within this array of numbers I want {PercentBuilder(pairs)} distinct number pairs that sum up to {target} and the remaining numbers are random within the range of 0 - {target}" +
-        //            $" I only want the JSON object";
-        
-        var value3 = $"Generate a JSON object named '{target}' with a value that's an array of {pairs} random integers between 0 and {target}. Then merge {pairs / 2} random number pairs that sum up to {target}. " +
-                     $"I only want you to return the one JSON object which will have an array of {pairs * 2} numbers meeting the conditions that I have defined";
-        Debug.Log($"Prompt: {value3}");
-        return value3;
-
-    }
-    
-    private string ComplexPromptBuilder(int target, int pairs = 21)
-    {
-        return
-            $"Generate a JSON object named '{target}' with a value that's an array of {pairs * 2} random numbers between 0 and {target}.  Include some pairs within the array that sum up to {target}. The number of pairs should be between {PercentBuilder(pairs)} and {PercentBuilder(pairs)}." +
-            $"\n Additionally, generate a secondary JSON object named \"config\" with the following structure:\n\n```json\n{{\n  \"config\": {{\n    \"numValues\": 36,\n    \"numPairs\": 12, // This will be the number between {PercentBuilder(pairs)} and {PercentBuilder(pairs)} that you used for determining the number of correct pairs\n    \"correctPairs\": [\n      // List of pairs that sum up to 117\n    ]\n  }}\n}}";
-    }
-
-    private int PercentBuilder(int pairs)
-    {
-        var input = UnityEngine.Random.Range(0.5f, 0.8f);
-        var rand = UnityEngine.Random.Range(input, Math.Min(input * 1.5f, 0.9f));
-        var value = Mathf.FloorToInt(rand * pairs);
-        Debug.Log($"correct pairs target: {value}, total pairs: {pairs}");
-        return value;
-    }
-
     private JObject ParseResponse(string content)
     {
         content = content.Replace("`", "").Replace("json", "");
         Debug.Log($"cleaned json: {content}");
         var data = JObject.Parse(content);
         return data;
+    }
+
+    #endregion
+
+    public async UniTask<HashSet<int>> SpawnBubblesAsync(string content)
+    {
+        return await UniTask.FromResult(SpawnBubbles(content));
+    }
+
+    public async UniTask ResetBubblesViewAsync()
+    {
+        ResetBubblesView();
+        await UniTask.Yield();
+    }
+
+    public async void TestApiRequest()
+    {
+        Debug.Log("Sending request from bubble controller");
+        var content = await GeminiRequestService.AsyncGeminiRequest(PromptBuilderService.BuildPromptSimple(314));
+        Debug.Log($"Received request from bubble controller");
+
+        var data = ParseResponse(content);
+        var solution = "";
+        JToken nums = null;
+
+        foreach (var VARIABLE in data)
+        {
+            solution = VARIABLE.Key;
+            nums = VARIABLE.Value;
+        }
+        
+        if (nums != null)
+        {
+            var list = ShuffleValues(ParseJToken(nums));
+            var enumerable = list as int[] ?? list.ToArray();
+            var pairs = GetSolutionNumbers(enumerable, int.Parse(solution));
+            Debug.Log($"Correct pairs: {pairs.Count / 2}\ndata: {pairs.ToJsonPretty()}");
+        }
+        else
+        {
+            Debug.LogError($"nums is null!!");
+        }
     }
 }

@@ -60,6 +60,15 @@ public class NumberBubble : MonoBehaviour
     {
         State = BubbleState.NotClicked;
     }
+
+    public void ResetBubble()
+    {
+        Value = 0;
+        State = BubbleState.NotClicked;
+        Image.color = Color.white;
+        _text.text = Value.ToString();
+        gameObject.SetActive(false);
+    }
 }
 
 public enum BubbleType

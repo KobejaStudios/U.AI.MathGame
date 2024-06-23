@@ -11,6 +11,8 @@ public class GameController : MonoBehaviour
     [SerializeField] private BubblesController _bubblesController;
     [SerializeField] private SolutionTargetController _solutionTargetController;
     [SerializeField] private TMP_InputField _inputField;
+
+    private HashSet<int> _solutionNumbers = new();
     
     public int SolutionTarget { get; set; }
 
@@ -55,6 +57,15 @@ public class GameController : MonoBehaviour
         );
     }
 
+    public async void StartRound()
+    {
+        await _bubblesController.ResetBubblesViewAsync();
+        var content = await GeminiRequestService.AsyncGeminiRequest(PromptBuilderService.BuildPromptSimple(314));
+        _solutionNumbers = await _bubblesController.SpawnBubblesAsync(content);
+        Debug.Log($"done awaiting");
+        EventManager.RaiseEvent(GameEvents.RoundStarted);
+    }
+
     private void RoundStart(Dictionary<string, object> context)
     {
         // spawn bubbles
@@ -70,6 +81,14 @@ public class GameController : MonoBehaviour
     private void OnTimeExpired(Dictionary<string, object> arg0)
     {
         // TODO: validation? thoughts about strengthening these win/loss conditions
+        foreach (var bubble in _solutionNumbers)
+        {
+            var current = _bubblesController.BubblesMap[bubble];
+            if (current.gameObject.activeInHierarchy)
+            {
+                current.Image.color = Color.green;
+            }
+        }
         EventManager.RaiseEvent(GameEvents.RoundLost);
     }
     
@@ -116,11 +135,6 @@ public class GameController : MonoBehaviour
                 Debug.Log("Failed");
             }
         }
-    }
-
-    public Dictionary<int, NumberBubble> GetBubblesMap()
-    {
-        return _bubblesController.bubblesMap;
     }
     
     private void RoundOver(Dictionary<string, object> context)
