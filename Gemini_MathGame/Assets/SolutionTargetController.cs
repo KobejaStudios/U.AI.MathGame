@@ -1,6 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
@@ -14,17 +15,15 @@ public class SolutionTargetController : MonoBehaviour
     private string _firstSlot;
     private string _secondSlot;
 
+    private CancellationTokenSource _cts = new();
     private void Start()
     {
-        // TODO: sub to events for bubble clicked, solution defined, solution evaluated
-        EventManager.AddListener(GameEvents.SolutionEvaluated, OnSolutionEvaluated);
         EventManager.AddListener(GameEvents.BubbleClicked, OnNumberBubbleClicked);
         EventManager.AddListener(GameEvents.SolutionDefined, OnSolutionDefined);
     }
     
     private void OnDestroy()
     {
-        EventManager.RemoveListener(GameEvents.SolutionEvaluated, OnSolutionEvaluated);
         EventManager.RemoveListener(GameEvents.BubbleClicked, OnNumberBubbleClicked);
         EventManager.RemoveListener(GameEvents.SolutionDefined, OnSolutionDefined);
     }
@@ -34,8 +33,7 @@ public class SolutionTargetController : MonoBehaviour
         if (arg0.TryGetAs("solution", out string solution))
         {
             _solutionTarget = solution;
-            _equationStringState = EquationStringState.EmptySolutionUpdate;
-            EquationStringBuilder(0);
+            ResetEquationStringAndState();
         }
         else
         {
@@ -55,13 +53,7 @@ public class SolutionTargetController : MonoBehaviour
         }
     }
 
-    private void OnSolutionEvaluated(Dictionary<string, object> arg0)
-    {
-        _equationStringState = EquationStringState.TwoSlotsFilled;
-        EquationStringBuilder(0);
-    }
-
-    private void EquationStringBuilder(int input)
+    private async void EquationStringBuilder(int input)
     {
         switch (_equationStringState)
         {
@@ -74,31 +66,48 @@ public class SolutionTargetController : MonoBehaviour
                 _secondSlot = input.ToString();
                 _solutionTargetText.text = $"<u>{_firstSlot}</u> + <u>{input}</u> = {_solutionTarget}";
                 _equationStringState = EquationStringState.TwoSlotsFilled;
+                await AnimationStub(_cts.Token);
                 break;
             case EquationStringState.TwoSlotsFilled:
-                _firstSlot = "";
-                _secondSlot = "";
-                _solutionTargetText.text = $"___ + ___ = {_solutionTarget}";
-                _equationStringState = EquationStringState.Empty;
-                break;
-            case EquationStringState.EmptySolutionUpdate:
-                _firstSlot = "";
-                _secondSlot = "";
-                _solutionTargetText.text = $"___ + ___ = {_solutionTarget}";
-                _equationStringState = EquationStringState.Empty;
+                _cts.Cancel();
+                _firstSlot = input.ToString();
+                _solutionTargetText.text = $"<u>{input}</u> + ___ = {_solutionTarget}";
+                _equationStringState = EquationStringState.OneSlotFilled;
                 break;
             default:
-                _solutionTargetText.text = $"___ + ___ = {_solutionTarget}";
-                _equationStringState = EquationStringState.Empty;
+                ResetEquationStringAndState();
                 break;
         }
+    }
+
+    private async UniTask AnimationStub(CancellationToken ct)
+    {
+        // TODO: this is still broken, really need to clean up this whole string manipulation
+        try
+        {
+            await UniTask.Delay(100, cancellationToken: ct);
+            ResetEquationStringAndState();
+            Debug.Log($"Animation awaiter was not canceled");
+        }
+        catch (OperationCanceledException e)
+        {
+            Debug.LogWarning($"Animation awaiter was canceled: {e.Message}. Not throwing an exception here");
+            throw;
+        }
+    }
+
+    private void ResetEquationStringAndState()
+    {
+        _firstSlot = "";
+        _secondSlot = "";
+        _solutionTargetText.text = $"___ + ___ = {_solutionTarget}";
+        _equationStringState = EquationStringState.Empty;
     }
 }
 
 public enum EquationStringState
 {
     Empty,
-    EmptySolutionUpdate,
     OneSlotFilled,
     TwoSlotsFilled
 }
