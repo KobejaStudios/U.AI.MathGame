@@ -13,14 +13,35 @@ public class BubblesController : MonoBehaviour
     [SerializeField] private NumberBubble[] _bubbles;
     public Dictionary<int, NumberBubble> bubblesMap = new();
     private Queue<NumberBubble> _bubblesQueue = new();
+    private HashSet<int> _solutionNumbers = new();
     [SerializeField] private GeminiRequestHandler _geminiRequestHandler;
 
     private void Start()
     {
         EventManager.AddListener(GameEvents.BubbleClicked, OnBubbleClicked);
         EventManager.AddListener(GameEvents.EvaluateSolution, OnEvaluateSolution);
+        EventManager.AddListener(GameEvents.TimeExpired, OnTimeExpired);
         
         Init();
+    }
+
+    private void OnDestroy()
+    {
+        EventManager.RemoveListener(GameEvents.BubbleClicked, OnBubbleClicked);
+        EventManager.RemoveListener(GameEvents.EvaluateSolution, OnEvaluateSolution);
+        EventManager.RemoveListener(GameEvents.TimeExpired, OnTimeExpired);
+    }
+
+    private void OnTimeExpired(Dictionary<string, object> arg0)
+    {
+        foreach (var bubble in _solutionNumbers)
+        {
+            var current = GameController.Instance.GetBubblesMap()[bubble];
+            if (current.gameObject.activeInHierarchy)
+            {
+                current.Image.color = Color.green;
+            }
+        }
     }
 
     private void OnEvaluateSolution(Dictionary<string, object> arg0)
@@ -77,12 +98,12 @@ public class BubblesController : MonoBehaviour
         {
             var list = ShuffleValues(ParseJToken(nums));
             var enumerable = list as int[] ?? list.ToArray();
-            var solutionNumbers = GetSolutionNumbers(enumerable, int.Parse(solution));
+            _solutionNumbers = GetSolutionNumbers(enumerable, int.Parse(solution));
             EventManager.RaiseEvent(GameEvents.PairsGoalDefined, new Dictionary<string, object>
             {
-                ["pairsGoal"] = solutionNumbers.Count / 2
+                ["pairsGoal"] = _solutionNumbers.Count / 2
             });
-            Debug.Log($"Correct pairs: {solutionNumbers.Count / 2}\ndata: {solutionNumbers.ToJsonPretty()}");
+            Debug.Log($"Correct pairs: {_solutionNumbers.Count / 2}\ndata: {_solutionNumbers.ToJsonPretty()}");
             
             foreach (var n in enumerable)
             {
@@ -91,6 +112,7 @@ public class BubblesController : MonoBehaviour
                 bubblesMap[_bubbles[count].Value] = _bubbles[count];
                 count++;
             }
+            EventManager.RaiseEvent(GameEvents.RoundStarted);
         }
         else
         {

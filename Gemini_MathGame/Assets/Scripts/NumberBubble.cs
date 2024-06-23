@@ -17,6 +17,7 @@ public class NumberBubble : MonoBehaviour
     public int Id => gameObject.GetInstanceID();
     public int Value { get; set; }
     public BubbleType BubbleType { get; set; }
+    public BubbleState State { get; set; }
 
     private Vector3 _startingPosition;
 
@@ -32,6 +33,8 @@ public class NumberBubble : MonoBehaviour
 
     private void OnClick()
     {
+        if (State == BubbleState.Clicked) return;
+        State = BubbleState.Clicked;
         _startingPosition = this.Transform.position;
         var eventData = new Dictionary<string, object>
         {
@@ -52,10 +55,21 @@ public class NumberBubble : MonoBehaviour
     {
         _text.text = value.ToString(CultureInfo.InvariantCulture);
     }
+
+    public void ClearBubbleState()
+    {
+        State = BubbleState.NotClicked;
+    }
 }
 
 public enum BubbleType
 {
     Int,
     Float
+}
+
+public enum BubbleState
+{
+    NotClicked,
+    Clicked
 }

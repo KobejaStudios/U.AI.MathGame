@@ -20,12 +20,29 @@ public class SolutionTargetController : MonoBehaviour
     {
         EventManager.AddListener(GameEvents.BubbleClicked, OnNumberBubbleClicked);
         EventManager.AddListener(GameEvents.SolutionDefined, OnSolutionDefined);
+        EventManager.AddListener(GameEvents.RoundWon, OnRoundWon);
+        EventManager.AddListener(GameEvents.RoundLost, OnRoundLost);
     }
-    
+
     private void OnDestroy()
     {
         EventManager.RemoveListener(GameEvents.BubbleClicked, OnNumberBubbleClicked);
         EventManager.RemoveListener(GameEvents.SolutionDefined, OnSolutionDefined);
+        EventManager.RemoveListener(GameEvents.RoundWon, OnRoundWon);
+        EventManager.RemoveListener(GameEvents.RoundLost, OnRoundLost);
+    }
+    
+    private void OnRoundLost(Dictionary<string, object> arg0)
+    {
+        _solutionTargetText.text = "Round Lost";
+    }
+
+    private async void OnRoundWon(Dictionary<string, object> arg0)
+    {
+        // TODO: remove this small hack, this is just for stubbed purposes
+        // we will need to improve how we handle win/loss conditions across the board
+        await UniTask.Delay(1000);
+        _solutionTargetText.text = "Round Won!";
     }
 
     private void OnSolutionDefined(Dictionary<string, object> arg0)

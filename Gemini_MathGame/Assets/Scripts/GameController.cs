@@ -33,6 +33,7 @@ public class GameController : MonoBehaviour
         EventManager.AddListener(GameEvents.SolutionEvaluated, SolutionEvaluated);
         EventManager.AddListener(GameEvents.RoundStarted, RoundStart);
         EventManager.AddListener(GameEvents.ScoreAdded, OnScoreAdded);
+        EventManager.AddListener(GameEvents.TimeExpired, OnTimeExpired);
     }
 
     private void OnDestroy()
@@ -41,6 +42,7 @@ public class GameController : MonoBehaviour
         EventManager.RemoveListener(GameEvents.SolutionEvaluated, SolutionEvaluated);
         EventManager.RemoveListener(GameEvents.RoundStarted, RoundStart);
         EventManager.RemoveListener(GameEvents.ScoreAdded, OnScoreAdded);
+        EventManager.RemoveListener(GameEvents.TimeExpired, OnTimeExpired);
     }
 
     public void SetSolution(int value)
@@ -66,6 +68,12 @@ public class GameController : MonoBehaviour
         // if solution reached, fire "SolutionEvaluated"
     }
     
+    private void OnTimeExpired(Dictionary<string, object> arg0)
+    {
+        // TODO: validation? thoughts about strengthening these win/loss conditions
+        EventManager.RaiseEvent(GameEvents.RoundLost);
+    }
+    
     private void OnScoreAdded(Dictionary<string, object> arg0)
     {
         if (arg0.TryGetAs("currentScore", out int currentScore) &&
@@ -74,6 +82,8 @@ public class GameController : MonoBehaviour
             if (currentScore == pairsGoal)
             {
                 Debug.Log("Winner!");
+                EventManager.RaiseEvent(GameEvents.ScoreGoalReached);
+                EventManager.RaiseEvent(GameEvents.RoundWon);
             }
         }
     }
@@ -83,22 +93,29 @@ public class GameController : MonoBehaviour
         // if correct, increment score
         var target = SolutionTarget;
         var solution = (int)context["solution"];
-        var bubbles = context["bubbles"] as Queue<NumberBubble>;
 
-        if (solution == target)
+        if (context.TryGetAs("bubbles", out Queue<NumberBubble> bubbles))
         {
-            EventManager.RaiseEvent(GameEvents.CorrectSolution, context);
-            Debug.Log($"Good Job!");
-            // TODO: move this logic elsewhere? perhaps a bubbles manager?
-            while (bubbles.Count > 0)
+            foreach (var bubble in bubbles)
             {
-                var current = bubbles.Dequeue();
-                current.gameObject.SetActive(false);
+                bubble.ClearBubbleState();
             }
-        }
-        else
-        {
-            Debug.Log("Failed");
+
+            if (solution == target)
+            {
+                EventManager.RaiseEvent(GameEvents.CorrectSolution, context);
+                Debug.Log($"Good Job!");
+                // TODO: move this logic elsewhere? perhaps a bubbles manager?
+                while (bubbles.Count > 0)
+                {
+                    var current = bubbles.Dequeue();
+                    current.gameObject.SetActive(false);
+                }
+            }
+            else
+            {
+                Debug.Log("Failed");
+            }
         }
     }
 
