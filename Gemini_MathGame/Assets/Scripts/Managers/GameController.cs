@@ -9,7 +9,6 @@ public class GameController : MonoBehaviour
 {
     public static GameController Instance;
     [SerializeField] private BubblesController _bubblesController;
-    [SerializeField] private ScoreController _scoreController;
     [SerializeField] private SolutionTargetController _solutionTargetController;
     [SerializeField] private TMP_InputField _inputField;
     
