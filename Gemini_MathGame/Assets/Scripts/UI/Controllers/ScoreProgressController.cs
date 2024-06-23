@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using LitMotion;
+using LitMotion.Extensions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,6 +15,8 @@ public class ScoreProgressController : MonoBehaviour
     private int _pairsGoal;
     private int _currentPairs;
     private float _progressSegment;
+    
+    [SerializeField] private AnimationCurve _curve;
 
     private void Start()
     {
@@ -73,7 +77,17 @@ public class ScoreProgressController : MonoBehaviour
         };
         
         EventManager.RaiseEvent(GameEvents.ScoreAdded, eventData);
-        _progressBarFill.fillAmount += _progressSegment;
+        AnimateFillBarUp();
         UpdateText();
+    }
+    
+    private void AnimateFillBarUp(float duration = 1f)
+    {
+        var current = _progressBarFill.fillAmount;
+        var next = _progressBarFill.fillAmount + _progressSegment;
+        LMotion
+            .Create(current, next, duration)
+            .WithEase(_curve)
+            .BindToFillAmount(_progressBarFill);
     }
 }

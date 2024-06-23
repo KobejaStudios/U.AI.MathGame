@@ -8302,6 +8302,39 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _text: {fileID: 638019798}
   _progressBarFill: {fileID: 150979973}
+  _curve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0.34661385
+      outSlope: 0.34661385
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.11303616
+    - serializedVersion: 3
+      time: 0.6019644
+      value: 0.5075542
+      inSlope: 1.5905937
+      outSlope: 1.5905937
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.06947025
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.8019409
+      value: 1.0094337
+      inSlope: 2.7852743
+      outSlope: 2.7852743
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.13973328
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!114 &2083549028 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2142418652345294943, guid: d7db33639e86ffc40b06bde405de5407, type: 3}
