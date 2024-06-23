@@ -31,6 +31,8 @@ public class ScoreProgressController : MonoBehaviour
     {
         _text.text = "0 / 0";
         _progressBarFill.fillAmount = 0f;
+        _pairsGoal = 0;
+        _currentPairs = 0;
     }
 
     private void InitUI()
