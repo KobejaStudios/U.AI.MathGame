@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using AssetKits.ParticleImage;
 using Cysharp.Threading.Tasks;
 using LitMotion;
 using LitMotion.Extensions;
@@ -16,6 +17,8 @@ public class HourglassController : MonoBehaviour
     [Header("Hourglass Components")] 
     [SerializeField] private Image _topHalfImage;
     [SerializeField] private Image _bottomHalfImage;
+    [SerializeField] private ParticleImage _sandParticles;
+    [SerializeField] private Color _lowTimeColor;
     private float _hourglassFillSegment;
     private CompositeMotionHandle _sandMoveMotionHandles = new();
     
@@ -41,6 +44,7 @@ public class HourglassController : MonoBehaviour
         ResetHourglassFill();
         _time = TimeSpan.FromSeconds(_timerSeconds);
         _timerText.text = _time.ToString(@"mm\:ss");
+        _timerText.color = Color.white;
         _goalReached = false;
     }
 
@@ -54,12 +58,16 @@ public class HourglassController : MonoBehaviour
     {
         _time = TimeSpan.FromSeconds(_timerSeconds);
         _timerText.text = _time.ToString(@"mm\:ss");
-        StartSandMovingAnimation(_timerSeconds);
+        StartSandAnimation(_timerSeconds);
         while (_time > TimeSpan.Zero || _goalReached)
         {
             await UniTask.Delay(1000, cancellationToken: _cts.Token);
             _time = _time.Subtract(TimeSpan.FromMilliseconds(1000));
             _timerText.text = _time.ToString(@"mm\:ss");
+            if (_time.Seconds <= 10)
+            {
+                _timerText.color = _lowTimeColor;
+            }
         }
 
         if (_time <= TimeSpan.Zero)
@@ -70,21 +78,26 @@ public class HourglassController : MonoBehaviour
 
     private void ResetHourglassFill()
     {
-        _sandMoveMotionHandles?.Cancel();
+        StopSandAnimation();
         _topHalfImage.fillAmount = 1f;
         _bottomHalfImage.fillAmount = 0f;
     }
 
     [ContextMenu("stop sand")]
-    private void StopSand()
+    private void StopSandAnimation()
     {
         _sandMoveMotionHandles?.Cancel();
+        _sandParticles.Stop();
+        _sandParticles.gameObject.SetActive(false);
     }
 
-    private void StartSandMovingAnimation(float duration)
+    private void StartSandAnimation(float duration)
     {
         var topCurrent = _topHalfImage.fillAmount;
         var bottomCurrent = _bottomHalfImage.fillAmount;
+        
+        _sandParticles.gameObject.SetActive(true);
+        _sandParticles.Play();
 
         LMotion.Create(topCurrent, 0f, duration)
             .WithEase(Ease.Linear)

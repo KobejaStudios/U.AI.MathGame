@@ -15,4 +15,7 @@ public static class GameEvents
     public const string RoundLost = "RoundLost";
     public const string ScoreGoalReached = "ScoreGoalReached";
     public const string TimeExpired = "TimeExpired";
+    // event that's fired when the player reaches low time, maybe this low time value will be a percentage
+    // of the initial time limit or just a flat 10 seconds. Currently using flat 10 seconds
+    public const string TimeRunningOut = "TimeRunningOut";
 }
