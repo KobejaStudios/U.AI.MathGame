@@ -866,6 +866,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1655141322}
     m_Modifications:
+    - target: {fileID: 2142418652345294943, guid: d7db33639e86ffc40b06bde405de5407, type: 3}
+      propertyPath: _spriteSheet.Array.size
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2142418652345294943, guid: d7db33639e86ffc40b06bde405de5407, type: 3}
+      propertyPath: _spriteSheet.Array.data[7]
+      value: 
+      objectReference: {fileID: 806475825, guid: ab76ddddf2e15f047807d1f157b21a78, type: 3}
     - target: {fileID: 2860366401985602917, guid: d7db33639e86ffc40b06bde405de5407, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

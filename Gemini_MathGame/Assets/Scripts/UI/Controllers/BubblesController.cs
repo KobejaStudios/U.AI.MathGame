@@ -1,10 +1,6 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Cysharp.Threading.Tasks;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 using Random = System.Random;
@@ -42,7 +38,7 @@ public class BubblesController : MonoBehaviour
         while (_bubblesQueue.Count > 0)
         {
             var current = _bubblesQueue.Dequeue();
-            current.Image.color = Color.white;
+            current.ResetBubbleColor();
             solution += current.Value;
             Debug.Log($"value: {current.Value} added to sum giving: {solution}");
         }

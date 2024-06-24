@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,6 +13,7 @@ public class NumberBubble : MonoBehaviour
     [SerializeField] private Button _button;
 
     [SerializeField] private Sprite[] _spriteSheet;
+    [SerializeField] private Color _baseColor;
     
     public TextMeshProUGUI Text => _text;
     public Image Image => _image;
@@ -63,18 +65,30 @@ public class NumberBubble : MonoBehaviour
         State = BubbleState.NotClicked;
     }
 
+    public void ResetBubbleColor()
+    {
+        Image.color = _baseColor;
+    }
+
     public void ResetBubble()
     {
         Value = 0;
         State = BubbleState.NotClicked;
-        Image.color = Color.white;
+        Image.color = _baseColor;
         _text.text = Value.ToString();
         gameObject.SetActive(false);
     }
 
-    public void AnimationBubblePop()
+    [ContextMenu("animate")]
+    public async void AnimationBubblePop()
     {
-        
+        var counter = 0;
+        while (counter < _spriteSheet.Length)
+        {
+            _image.sprite = _spriteSheet[counter];
+            await UniTask.Delay(25);
+            counter++;
+        }
     }
 }
 
