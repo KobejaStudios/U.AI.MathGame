@@ -18,8 +18,6 @@ public class HourglassController : MonoBehaviour
     [SerializeField] private Image _bottomHalfImage;
     private float _hourglassFillSegment;
     private CompositeMotionHandle _sandMoveMotionHandles = new();
-
-    [SerializeField] private Slider _slider;
     
     private TimeSpan _time;
     private bool _goalReached;
@@ -96,11 +94,6 @@ public class HourglassController : MonoBehaviour
         LMotion.Create(bottomCurrent, 1f, duration)
             .WithEase(Ease.Linear)
             .BindToFillAmount(_bottomHalfImage)
-            .AddTo(_sandMoveMotionHandles);
-
-        var start = _slider.value;
-        LMotion.Create(start, 0f, duration)
-            .Bind(x => _slider.value = x)
             .AddTo(_sandMoveMotionHandles);
     }
 
