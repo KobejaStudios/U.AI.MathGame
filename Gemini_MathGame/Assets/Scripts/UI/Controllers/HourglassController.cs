@@ -2,13 +2,25 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using LitMotion;
+using LitMotion.Extensions;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class HourglassController : MonoBehaviour
 {
     [SerializeField] private int _timerSeconds;
     [SerializeField] private TextMeshProUGUI _timerText;
+
+    [Header("Hourglass Components")] 
+    [SerializeField] private Image _topHalfImage;
+    [SerializeField] private Image _bottomHalfImage;
+    private float _hourglassFillSegment;
+    private CompositeMotionHandle _sandMoveMotionHandles = new();
+
+    [SerializeField] private Slider _slider;
+    
     private TimeSpan _time;
     private bool _goalReached;
     private CancellationTokenSource _cts = new();
@@ -28,6 +40,7 @@ public class HourglassController : MonoBehaviour
     {
         _cts.Cancel();
         _cts = new CancellationTokenSource();
+        ResetHourglassFill();
         _time = TimeSpan.FromSeconds(_timerSeconds);
         _timerText.text = _time.ToString(@"mm\:ss");
         _goalReached = false;
@@ -43,6 +56,7 @@ public class HourglassController : MonoBehaviour
     {
         _time = TimeSpan.FromSeconds(_timerSeconds);
         _timerText.text = _time.ToString(@"mm\:ss");
+        StartSandMovingAnimation(_timerSeconds);
         while (_time > TimeSpan.Zero || _goalReached)
         {
             await UniTask.Delay(1000, cancellationToken: _cts.Token);
@@ -54,6 +68,40 @@ public class HourglassController : MonoBehaviour
         {
             EventManager.RaiseEvent(GameEvents.TimeExpired);
         }
+    }
+
+    private void ResetHourglassFill()
+    {
+        _sandMoveMotionHandles?.Cancel();
+        _topHalfImage.fillAmount = 1f;
+        _bottomHalfImage.fillAmount = 0f;
+    }
+
+    [ContextMenu("stop sand")]
+    private void StopSand()
+    {
+        _sandMoveMotionHandles?.Cancel();
+    }
+
+    private void StartSandMovingAnimation(float duration)
+    {
+        var topCurrent = _topHalfImage.fillAmount;
+        var bottomCurrent = _bottomHalfImage.fillAmount;
+
+        LMotion.Create(topCurrent, 0f, duration)
+            .WithEase(Ease.Linear)
+            .BindToFillAmount(_topHalfImage)
+            .AddTo(_sandMoveMotionHandles);
+
+        LMotion.Create(bottomCurrent, 1f, duration)
+            .WithEase(Ease.Linear)
+            .BindToFillAmount(_bottomHalfImage)
+            .AddTo(_sandMoveMotionHandles);
+
+        var start = _slider.value;
+        LMotion.Create(start, 0f, duration)
+            .Bind(x => _slider.value = x)
+            .AddTo(_sandMoveMotionHandles);
     }
 
     [ContextMenu("kill time")]
