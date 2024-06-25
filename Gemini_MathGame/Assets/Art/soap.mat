@@ -332,13 +332,13 @@ Material:
     - _PoisonNoiseBrightness: 2
     - _PoisonRecolorFactor: 0.5
     - _PoisonShiftSpeed: 0.2
-    - _RainbowBrightness: 2
+    - _RainbowBrightness: 1.5341477
     - _RainbowContrast: 1
-    - _RainbowDensity: 0.5
+    - _RainbowDensity: 0.4875446
     - _RainbowFade: 1
     - _RainbowNoiseFactor: 0.2
     - _RainbowSaturation: 1
-    - _RainbowSpeed: 0.05
+    - _RainbowSpeed: 0.049890812
     - _RecolorRGBFade: 1
     - _RecolorRGBTextureToggle: 0
     - _RecolorRGBYCPFade: 1
@@ -566,7 +566,7 @@ Material:
     - _PoisonColor: {r: 0.3137255, g: 2.996078, b: 0.3137255, a: 0}
     - _PoisonNoiseScale: {r: 0.2, g: 0.2, b: 0, a: 0}
     - _PoisonNoiseSpeed: {r: 0, g: -0.2, b: 0, a: 0}
-    - _RainbowCenter: {r: 0, g: 0, b: 0, a: 0}
+    - _RainbowCenter: {r: 2.5185637, g: 2.717738, b: 0, a: 0}
     - _RainbowNoiseScale: {r: 0.2, g: 0.2, b: 0, a: 0}
     - _RecolorRGBBlueTint: {r: 1, g: 1, b: 1, a: 0.5019608}
     - _RecolorRGBGreenTint: {r: 1, g: 1, b: 1, a: 0.5019608}
