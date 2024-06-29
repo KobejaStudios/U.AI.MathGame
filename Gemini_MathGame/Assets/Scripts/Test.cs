@@ -6,11 +6,6 @@ using Random = UnityEngine.Random;
 
 public class Test : MonoBehaviour
 {
-    private void Start()
-    {
-        ServiceLocator.Get<INumberGeneratorService>().GetNumbers(257, 40, 12, EquationOperation.Addition);
-    }
-
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.A))
@@ -27,6 +22,13 @@ public class Test : MonoBehaviour
         var remainder = len % 2;
         len -= remainder;
         var correct = len / 2;
-        ServiceLocator.Get<INumberGeneratorService>().GetNumbers(sol, len, correct, EquationOperation.Addition);
+        var gameData = new GameData
+        {
+            SolutionTarget = sol,
+            NumberSetLength = len,
+            CorrectNumbersLength = correct,
+            EquationOperation = EquationOperation.Addition
+        };
+        ServiceLocator.Get<INumberGeneratorService>().GetNumbers(gameData);
     }
 }

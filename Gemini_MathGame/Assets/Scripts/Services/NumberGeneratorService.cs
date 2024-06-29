@@ -9,7 +9,7 @@ using Random = UnityEngine.Random;
 
 public interface INumberGeneratorService
 {
-    GeneratedNumbersData<int> GetNumbers(int solutionTarget, int setLength, int correctNumbers, EquationOperation equationType, BubbleCollectionOrientation bubblesOrientation = BubbleCollectionOrientation.Shuffled, bool isAllowDuplicates = false);
+    GeneratedNumbersData<int> GetNumbers(GameData gameData);
 }
 
 public struct GeneratedNumbersData<T>
@@ -24,15 +24,15 @@ public class NumberGeneratorService : INumberGeneratorService
 {
     private int _currentResetCount;
     private readonly System.Random _random = new();
-    public GeneratedNumbersData<int> GetNumbers(int solutionTarget, int setLength, int correctNumbers, EquationOperation equationType, BubbleCollectionOrientation bubblesOrientation = BubbleCollectionOrientation.Shuffled, bool isAllowDuplicates = false)
+    public GeneratedNumbersData<int> GetNumbers(GameData gameData)
     {
         var result = new GeneratedNumbersData<int>();
-        switch (equationType)
+        switch (gameData.EquationOperation)
         {
             case EquationOperation.Addition:
-                result = isAllowDuplicates 
-                    ? GetAdditionNumberSet(solutionTarget, setLength, correctNumbers) 
-                    : GetAdditionNumberList(solutionTarget, setLength, correctNumbers);
+                result = gameData.IsDuplicatesAllowed 
+                    ? GetAdditionNumberSet(gameData.SolutionTarget, gameData.NumberSetLength, gameData.CorrectNumbersLength) 
+                    : GetAdditionNumberList(gameData.SolutionTarget, gameData.NumberSetLength, gameData.CorrectNumbersLength);
                 break;
             case EquationOperation.Subtraction:
                 break;
@@ -41,7 +41,7 @@ public class NumberGeneratorService : INumberGeneratorService
             case EquationOperation.Division:
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(equationType), equationType, null);
+                throw new ArgumentOutOfRangeException(nameof(gameData.EquationOperation), gameData.EquationOperation, null);
         }
         
         return result;
