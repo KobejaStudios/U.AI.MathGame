@@ -20,3 +20,10 @@ public enum NetworkMode
     Offline,
     Online
 }
+
+public enum BubbleCollectionOrientation
+{
+    Shuffled,
+    LowSorted,
+    HighSorted
+}

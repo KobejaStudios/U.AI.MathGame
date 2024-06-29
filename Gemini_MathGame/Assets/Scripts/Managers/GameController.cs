@@ -54,7 +54,7 @@ public class GameController : MonoBehaviour
         EventManager.RaiseEvent(GameEvents.SolutionDefined,
             new Dictionary<string, object> 
             {
-                ["solution"] = value
+                [GameParams.solution] = value
             }
         );
     }
@@ -116,7 +116,7 @@ public class GameController : MonoBehaviour
     {
         // if correct, increment score
         var target = SolutionTarget;
-        var solution = (int)context["solution"];
+        var solution = (int)context[GameParams.solution];
 
         if (context.TryGetAs("bubbles", out Queue<NumberBubble> bubbles))
         {

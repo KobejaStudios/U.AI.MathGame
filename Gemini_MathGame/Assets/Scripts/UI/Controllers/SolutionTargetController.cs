@@ -57,7 +57,7 @@ public class SolutionTargetController : MonoBehaviour
 
     private void OnSolutionDefined(Dictionary<string, object> arg0)
     {
-        if (arg0.TryGetAs("solution", out string solution))
+        if (arg0.TryGetAs(GameParams.solution, out string solution))
         {
             _solutionTarget = solution;
             ResetEquationStringAndState();

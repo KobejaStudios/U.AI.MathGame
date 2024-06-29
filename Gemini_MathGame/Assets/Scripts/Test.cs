@@ -8,7 +8,7 @@ public class Test : MonoBehaviour
 {
     private void Start()
     {
-        ServiceLocator.Get<INumberSetGenerator>().GetNumberSet(257, 40, 12);
+        ServiceLocator.Get<INumberGeneratorService>().GetNumbers(257, 40, 12, EquationOperation.Addition);
     }
 
     private void Update()
@@ -27,6 +27,6 @@ public class Test : MonoBehaviour
         var remainder = len % 2;
         len -= remainder;
         var correct = len / 2;
-        ServiceLocator.Get<INumberSetGenerator>().GetNumberSet(sol, len, correct);
+        ServiceLocator.Get<INumberGeneratorService>().GetNumbers(sol, len, correct, EquationOperation.Addition);
     }
 }

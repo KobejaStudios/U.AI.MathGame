@@ -11,6 +11,6 @@ public class LaunchInitializationController : MonoBehaviour
     {
         ServiceLocator.CreateAndRegisterService<IGeminiRequestService, GeminiRequestService>();
         ServiceLocator.CreateAndRegisterService<IPromptBuilderService, PromptBuilderService>();
-        ServiceLocator.CreateAndRegisterService<INumberSetGenerator, NumberSetGenerator>();
+        ServiceLocator.CreateAndRegisterService<INumberGeneratorService, NumberGeneratorService>();
     }
 }

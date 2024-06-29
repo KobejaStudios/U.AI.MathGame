@@ -19,3 +19,11 @@ public static class GameEvents
     // of the initial time limit or just a flat 10 seconds. Currently using flat 10 seconds
     public const string TimeRunningOut = "TimeRunningOut";
 }
+
+public static class GameParams
+{
+    public const string solution = "solution";
+    public const string correctNumbers = "correctNumbers";
+    public const string incorrectNumbers = "incorrectNumbers";
+    public const string totalNumbers = "totalNumbers";
+}

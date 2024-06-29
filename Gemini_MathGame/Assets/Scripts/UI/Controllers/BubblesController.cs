@@ -45,7 +45,7 @@ public class BubblesController : MonoBehaviour
         
         var eventData = new Dictionary<string, object>
         {
-            ["solution"] = solution,
+            [GameParams.solution] = solution,
             ["bubbles"] = temp
         };
         EventManager.RaiseEvent(GameEvents.SolutionEvaluated, eventData);
@@ -111,6 +111,37 @@ public class BubblesController : MonoBehaviour
 
         return _solutionNumbers;
     }
+
+    private void SpawnBubbles(List<int> numbers)
+    {
+        var count = 0;
+        if (numbers != null)
+        {
+            _solutionNumbers = GetSolutionNumbers(enumerable, int.Parse(solution));
+            EventManager.RaiseEvent(GameEvents.PairsGoalDefined, new Dictionary<string, object>
+            {
+                ["pairsGoal"] = _solutionNumbers.Count / 2
+            });
+            Debug.Log($"Correct pairs: {_solutionNumbers.Count / 2}\ndata: {_solutionNumbers.ToJsonPretty()}");
+            
+            foreach (var n in enumerable)
+            {
+                _bubbles[count].gameObject.SetActive(true);
+                _bubbles[count].UpdateValue(n);
+                BubblesMap[_bubbles[count].Value] = _bubbles[count];
+                count++;
+            }
+        }
+        else
+        {
+            Debug.LogError($"nums is null!!");
+        }
+    }
+    
+    private void SpawnBubbles(List<float> numbers)
+    {
+        
+    }
     
     private HashSet<int> GetSolutionNumbers(IEnumerable<int> input, int solutionTarget)
     {
@@ -142,23 +173,6 @@ public class BubblesController : MonoBehaviour
         }
 
         return list;
-    }
-
-    private IEnumerable<int> ShuffleValues(IEnumerable<int> values)
-    {
-        var oldList = values.ToHashSet().ToList();
-        var newList = new List<int>();
-
-        while (oldList.Count > 0)
-        {
-            var random = new Random();
-            var index = random.Next(0, oldList.Count - 1);
-            var current = oldList[index];
-            newList.Add(current);
-            oldList.RemoveAt(index);
-        }
-
-        return newList;
     }
 
     private JObject ParseResponse(string content)
