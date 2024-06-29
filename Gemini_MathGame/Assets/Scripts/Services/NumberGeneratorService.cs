@@ -9,7 +9,7 @@ using Random = UnityEngine.Random;
 
 public interface INumberGeneratorService
 {
-    GeneratedNumbersData<int> GetNumbers(GameData gameData);
+    GeneratedNumbersData<int> GetNumbers(GameConfig gameConfig);
 }
 
 public struct GeneratedNumbersData<T>
@@ -24,15 +24,15 @@ public class NumberGeneratorService : INumberGeneratorService
 {
     private int _currentResetCount;
     private readonly System.Random _random = new();
-    public GeneratedNumbersData<int> GetNumbers(GameData gameData)
+    public GeneratedNumbersData<int> GetNumbers(GameConfig gameConfig)
     {
         var result = new GeneratedNumbersData<int>();
-        switch (gameData.EquationOperation)
+        switch (gameConfig.EquationOperation)
         {
             case EquationOperation.Addition:
-                result = gameData.IsDuplicatesAllowed 
-                    ? GetAdditionNumberSet(gameData.SolutionTarget, gameData.NumberSetLength, gameData.CorrectNumbersLength) 
-                    : GetAdditionNumberList(gameData.SolutionTarget, gameData.NumberSetLength, gameData.CorrectNumbersLength);
+                result = gameConfig.IsDuplicatesAllowed 
+                    ? GetAdditionNumberSet(gameConfig.SolutionTarget, gameConfig.NumberSetLength, gameConfig.CorrectNumbersLength) 
+                    : GetAdditionNumberList(gameConfig.SolutionTarget, gameConfig.NumberSetLength, gameConfig.CorrectNumbersLength);
                 break;
             case EquationOperation.Subtraction:
                 break;
@@ -41,7 +41,7 @@ public class NumberGeneratorService : INumberGeneratorService
             case EquationOperation.Division:
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(gameData.EquationOperation), gameData.EquationOperation, null);
+                throw new ArgumentOutOfRangeException(nameof(gameConfig.EquationOperation), gameConfig.EquationOperation, null);
         }
         
         return result;

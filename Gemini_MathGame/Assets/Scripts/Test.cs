@@ -22,13 +22,13 @@ public class Test : MonoBehaviour
         var remainder = len % 2;
         len -= remainder;
         var correct = len / 2;
-        var gameData = new GameData
-        {
-            SolutionTarget = sol,
-            NumberSetLength = len,
-            CorrectNumbersLength = correct,
-            EquationOperation = EquationOperation.Addition
-        };
+        var gameData = new GameConfig(
+            sol,
+            len,
+            correct,
+            EquationOperation.Addition,
+            BubbleCollectionOrientation.Shuffled,
+            false);
         ServiceLocator.Get<INumberGeneratorService>().GetNumbers(gameData);
     }
 }

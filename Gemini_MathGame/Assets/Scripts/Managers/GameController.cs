@@ -34,6 +34,7 @@ public class GameController : MonoBehaviour
     {
         EventManager.AddListener(GameEvents.BubbleClicked, BubbleClicked);
         EventManager.AddListener(GameEvents.SolutionEvaluated, SolutionEvaluated);
+        EventManager.AddListener(GameEvents.SolutionDefined, OnSolutionDefined);
         EventManager.AddListener(GameEvents.RoundStarted, RoundStart);
         EventManager.AddListener(GameEvents.ScoreAdded, OnScoreAdded);
         EventManager.AddListener(GameEvents.TimeExpired, OnTimeExpired);
@@ -43,20 +44,18 @@ public class GameController : MonoBehaviour
     {
         EventManager.RemoveListener(GameEvents.BubbleClicked, BubbleClicked);
         EventManager.RemoveListener(GameEvents.SolutionEvaluated, SolutionEvaluated);
+        EventManager.RemoveListener(GameEvents.SolutionDefined, OnSolutionDefined);
         EventManager.RemoveListener(GameEvents.RoundStarted, RoundStart);
         EventManager.RemoveListener(GameEvents.ScoreAdded, OnScoreAdded);
         EventManager.RemoveListener(GameEvents.TimeExpired, OnTimeExpired);
     }
 
-    public void SetSolution(int value)
+    private void OnSolutionDefined(Dictionary<string, object> arg0)
     {
-        SolutionTarget = value;
-        EventManager.RaiseEvent(GameEvents.SolutionDefined,
-            new Dictionary<string, object> 
-            {
-                [GameParams.solution] = value
-            }
-        );
+        if (arg0.TryGetAs(GameParams.solution, out int solution))
+        {
+            SolutionTarget = solution;
+        }
     }
 
     public async void StartRound()
@@ -66,13 +65,14 @@ public class GameController : MonoBehaviour
         _solutionTargetController.ResetController();
         await _bubblesController.ResetBubblesViewAsync();
         // TODO: build this data from the menus
-        var gameData = new GameData
-        {
-            SolutionTarget = 200,
-            NumberSetLength = 40,
-            CorrectNumbersLength = 20,
-            EquationOperation = EquationOperation.Addition
-        };
+        var gameData = new GameConfig(
+            200,
+            40,
+            20,
+            EquationOperation.Addition,
+            BubbleCollectionOrientation.Shuffled,
+            false
+            );
         var numbersData = 
             ServiceLocator.Get<INumberGeneratorService>().GetNumbers(gameData);
         _bubblesController.SpawnBubblesInt(numbersData, () =>
