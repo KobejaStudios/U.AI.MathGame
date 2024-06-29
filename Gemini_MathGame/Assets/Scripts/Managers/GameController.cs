@@ -12,7 +12,6 @@ public class GameController : MonoBehaviour
     [SerializeField] private SolutionTargetController _solutionTargetController;
     [SerializeField] private HourglassController _hourglassController;
     [SerializeField] private ScoreProgressController _scoreProgressController;
-    [SerializeField] private TMP_InputField _inputField;
 
     private HashSet<int> _solutionNumbers = new();
     
@@ -33,28 +32,29 @@ public class GameController : MonoBehaviour
     private void Start()
     {
         EventManager.AddListener(GameEvents.BubbleClicked, BubbleClicked);
-        EventManager.AddListener(GameEvents.SolutionEvaluated, SolutionEvaluated);
-        EventManager.AddListener(GameEvents.SolutionDefined, OnSolutionDefined);
+        EventManager.AddListener(GameEvents.SolutionEvaluated, OnSolutionEvaluated);
         EventManager.AddListener(GameEvents.RoundStarted, RoundStart);
         EventManager.AddListener(GameEvents.ScoreAdded, OnScoreAdded);
         EventManager.AddListener(GameEvents.TimeExpired, OnTimeExpired);
+        EventManager.AddListener(GameEvents.NumberGenerationComplete, OnNumberGenerationComplete);
     }
 
     private void OnDestroy()
     {
         EventManager.RemoveListener(GameEvents.BubbleClicked, BubbleClicked);
-        EventManager.RemoveListener(GameEvents.SolutionEvaluated, SolutionEvaluated);
-        EventManager.RemoveListener(GameEvents.SolutionDefined, OnSolutionDefined);
+        EventManager.RemoveListener(GameEvents.SolutionEvaluated, OnSolutionEvaluated);
         EventManager.RemoveListener(GameEvents.RoundStarted, RoundStart);
         EventManager.RemoveListener(GameEvents.ScoreAdded, OnScoreAdded);
         EventManager.RemoveListener(GameEvents.TimeExpired, OnTimeExpired);
+        EventManager.RemoveListener(GameEvents.NumberGenerationComplete, OnNumberGenerationComplete);
     }
-
-    private void OnSolutionDefined(Dictionary<string, object> arg0)
+    
+    private void OnNumberGenerationComplete(Dictionary<string, object> arg0)
     {
-        if (arg0.TryGetAs(GameParams.solution, out int solution))
+        if (arg0.TryGetAs(GameParams.data, out GeneratedNumbersData<int> data))
         {
-            SolutionTarget = solution;
+            _solutionNumbers = data.CorrectNumbers;
+            SolutionTarget = data.SolutionTarget;
         }
     }
 
@@ -110,8 +110,8 @@ public class GameController : MonoBehaviour
     
     private void OnScoreAdded(Dictionary<string, object> arg0)
     {
-        if (arg0.TryGetAs("currentScore", out int currentScore) &&
-            arg0.TryGetAs("pairsGoal", out int pairsGoal))
+        if (arg0.TryGetAs(GameParams.currentScore, out int currentScore) &&
+            arg0.TryGetAs(GameParams.pairsGoal, out int pairsGoal))
         {
             if (currentScore == pairsGoal)
             {
@@ -122,13 +122,12 @@ public class GameController : MonoBehaviour
         }
     }
     
-    private void SolutionEvaluated(Dictionary<string, object> context)
+    private void OnSolutionEvaluated(Dictionary<string, object> context)
     {
-        // if correct, increment score
         var target = SolutionTarget;
         var solution = (int)context[GameParams.solution];
 
-        if (context.TryGetAs("bubbles", out Queue<NumberBubble> bubbles))
+        if (context.TryGetAs(GameParams.bubbles, out Queue<NumberBubble> bubbles))
         {
             foreach (var bubble in bubbles)
             {
@@ -138,17 +137,13 @@ public class GameController : MonoBehaviour
             if (solution == target)
             {
                 EventManager.RaiseEvent(GameEvents.CorrectSolution, context);
-                Debug.Log($"Good Job!");
+
                 // TODO: move this logic elsewhere? perhaps a bubbles manager?
                 while (bubbles.Count > 0)
                 {
                     var current = bubbles.Dequeue();
                     current.gameObject.SetActive(false);
                 }
-            }
-            else
-            {
-                Debug.Log("Failed");
             }
         }
     }

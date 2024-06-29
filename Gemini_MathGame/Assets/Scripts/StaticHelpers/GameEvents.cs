@@ -24,6 +24,9 @@ public static class GameEvents
 public static class GameParams
 {
     public const string solution = "solution";
+    public const string bubbles = "bubbles";
+    public const string currentScore = "currentScore";
+    public const string pairsGoal = "pairsGoal";
     public const string correctNumbers = "correctNumbers";
     public const string incorrectNumbers = "incorrectNumbers";
     public const string totalNumbers = "totalNumbers";
