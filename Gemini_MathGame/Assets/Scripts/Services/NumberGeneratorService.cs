@@ -9,15 +9,24 @@ using Random = UnityEngine.Random;
 
 public interface INumberGeneratorService
 {
-    List<int> GetNumbers(int solutionTarget, int setLength, int correctNumbers, EquationOperation equationType, BubbleCollectionOrientation bubblesOrientation = BubbleCollectionOrientation.Shuffled, bool isAllowDuplicates = false);
+    GeneratedNumbersData<int> GetNumbers(int solutionTarget, int setLength, int correctNumbers, EquationOperation equationType, BubbleCollectionOrientation bubblesOrientation = BubbleCollectionOrientation.Shuffled, bool isAllowDuplicates = false);
 }
+
+public struct GeneratedNumbersData<T>
+{
+    public List<T> TotalNumbers;
+    public HashSet<T> CorrectNumbers;
+    public List<T> IncorrectNumbers;
+    public T SolutionTarget;
+}
+
 public class NumberGeneratorService : INumberGeneratorService
 {
     private int _currentResetCount;
     private readonly System.Random _random = new();
-    public List<int> GetNumbers(int solutionTarget, int setLength, int correctNumbers, EquationOperation equationType, BubbleCollectionOrientation bubblesOrientation = BubbleCollectionOrientation.Shuffled, bool isAllowDuplicates = false)
+    public GeneratedNumbersData<int> GetNumbers(int solutionTarget, int setLength, int correctNumbers, EquationOperation equationType, BubbleCollectionOrientation bubblesOrientation = BubbleCollectionOrientation.Shuffled, bool isAllowDuplicates = false)
     {
-        var result = new List<int>();
+        var result = new GeneratedNumbersData<int>();
         switch (equationType)
         {
             case EquationOperation.Addition:
@@ -35,7 +44,7 @@ public class NumberGeneratorService : INumberGeneratorService
                 throw new ArgumentOutOfRangeException(nameof(equationType), equationType, null);
         }
         
-        return ShuffleValues(result);
+        return result;
     }
 
     #region Generics
@@ -60,57 +69,78 @@ public class NumberGeneratorService : INumberGeneratorService
 
     #region Addition
 
-    private List<int> GetAdditionNumberSet(int solutionTarget, int setLength, int correctNumbers)
+    private GeneratedNumbersData<int> GetAdditionNumberSet(int solutionTarget, int setLength, int correctNumbers)
     {
         _currentResetCount = 0;
         var remainderLength = setLength - correctNumbers;
-        var result = new HashSet<int>();
+        var hashSet = new HashSet<int>();
+        var remainders = new List<int>();
+        var totalNumbers = new List<int>();
 
         // iterate over the correctNumbers int by 2, creating pairs of correct bubbles
         for (int i = 0; i < correctNumbers; i+= 2)
         {
             var current = Random.Range(0, solutionTarget);
 
-            while (result.Contains(current))
+            while (hashSet.Contains(current))
             {
                 current = Random.Range(0, solutionTarget);
                 _currentResetCount++;
             }
 
             var compliment = solutionTarget - current;
-            result.Add(current);
-            result.Add(compliment);
+            hashSet.Add(current);
+            hashSet.Add(compliment);
         }
+
+        var solutionSet = new HashSet<int>(hashSet);
         
         // iterate over the remainder and just create random bubbles
         for (int i = 0; i < remainderLength; i++)
         {
             var current = Random.Range(0, solutionTarget);
             
-            while (result.Contains(current))
+            while (hashSet.Contains(current))
             {
                 current = Random.Range(0, solutionTarget);
                 _currentResetCount++;
             }
 
-            result.Add(current);
+            remainders.Add(current);
         }
+        
+        totalNumbers.AddRange(solutionSet);
+        totalNumbers.AddRange(remainders);
 
-        return result.ToList();
+        var data = new GeneratedNumbersData<int>
+        {
+            SolutionTarget = solutionTarget,
+            CorrectNumbers = solutionSet,
+            IncorrectNumbers = remainders,
+            TotalNumbers = totalNumbers
+        };
+        
+        EventManager.RaiseEvent(GameEvents.NumberGenerationComplete, new Dictionary<string, object>
+        {
+            [GameParams.data] = data
+        });
+
+        return data;
 
         // Debug.Log($"args0: {solutionTarget}, args1: {setLength}, args2: {correctNumbers}, remainderLength: {remainderLength}");
         // Debug.Log($"time: {sw.Elapsed}, length: {result.Count}, resets: {_currentResetCount}\nsb: {sb}");
     }
     
-    private List<int> GetAdditionNumberList(int solutionTarget, int setLength, int correctNumbers)
+    private GeneratedNumbersData<int> GetAdditionNumberList(int solutionTarget, int setLength, int correctNumbers)
     {
         // TODO: evaluate this list approach, I don't think O(n^2) is the end of the world here when
         // 20 <= n <= 60 but it's always worth checking. Also this algorithm as a whole should be evaluated
         // by others
         _currentResetCount = 0;
         var remainderLength = setLength - correctNumbers;
-        var result = new List<int>();
-        var solutions = new List<int>();
+        var remainders = new List<int>();
+        var solutionSet = new HashSet<int>();
+        var totalNumbers = new List<int>();
 
         // iterate over the correctNumbers int by 2, creating pairs of correct bubbles
         for (int i = 0; i < correctNumbers; i+= 2)
@@ -118,8 +148,8 @@ public class NumberGeneratorService : INumberGeneratorService
             var current = Random.Range(0, solutionTarget);
             var compliment = solutionTarget - current;
             
-            solutions.Add(current);
-            solutions.Add(compliment);
+            solutionSet.Add(current);
+            solutionSet.Add(compliment);
         }
         
         // iterate over the remainder and just create random bubbles
@@ -127,17 +157,32 @@ public class NumberGeneratorService : INumberGeneratorService
         {
             var current = Random.Range(0, solutionTarget);
             
-            while (solutions.Contains(current))
+            while (solutionSet.Contains(current))
             {
                 current = Random.Range(0, solutionTarget);
                 _currentResetCount++;
             }
 
-            result.Add(current);
+            remainders.Add(current);
         }
+        
+        totalNumbers.AddRange(remainders);
+        totalNumbers.AddRange(solutionSet);
+        
+        var data = new GeneratedNumbersData<int>
+        {
+            SolutionTarget = solutionTarget,
+            CorrectNumbers = solutionSet,
+            IncorrectNumbers = remainders,
+            TotalNumbers = totalNumbers
+        };
+        
+        EventManager.RaiseEvent(GameEvents.NumberGenerationComplete, new Dictionary<string, object>
+        {
+            [GameParams.data] = data
+        });
 
-        result.AddRange(solutions);
-        return result;
+        return data;
 
         // Debug.Log($"args0: {solutionTarget}, args1: {setLength}, args2: {correctNumbers}, remainderLength: {remainderLength}");
         // Debug.Log($"time: {sw.Elapsed}, length: {result.Count}, resets: {_currentResetCount}\nsb: {sb}");

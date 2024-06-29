@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
@@ -72,70 +73,67 @@ public class BubblesController : MonoBehaviour
     
     private HashSet<int> SpawnBubbles(string content)
     {
-        var data = ParseResponse(content);
-        var solution = "";
-        JToken nums = null;
-
-        foreach (var kvp in data)
-        {
-            solution = kvp.Key;
-            nums = kvp.Value;
-        }
-
-        GameController.Instance.SetSolution(int.Parse(solution));
-        
-        var count = 0;
-        if (nums != null)
-        {
-            var list = ShuffleValues(ParseJToken(nums));
-            var enumerable = list as int[] ?? list.ToArray();
-            _solutionNumbers = GetSolutionNumbers(enumerable, int.Parse(solution));
-            EventManager.RaiseEvent(GameEvents.PairsGoalDefined, new Dictionary<string, object>
-            {
-                ["pairsGoal"] = _solutionNumbers.Count / 2
-            });
-            Debug.Log($"Correct pairs: {_solutionNumbers.Count / 2}\ndata: {_solutionNumbers.ToJsonPretty()}");
-            
-            foreach (var n in enumerable)
-            {
-                _bubbles[count].gameObject.SetActive(true);
-                _bubbles[count].UpdateValue(n);
-                BubblesMap[_bubbles[count].Value] = _bubbles[count];
-                count++;
-            }
-        }
-        else
-        {
-            Debug.LogError($"nums is null!!");
-        }
-
-        return _solutionNumbers;
+        // var data = ParseResponse(content);
+        // var solution = "";
+        // JToken nums = null;
+        //
+        // foreach (var kvp in data)
+        // {
+        //     solution = kvp.Key;
+        //     nums = kvp.Value;
+        // }
+        //
+        // GameController.Instance.SetSolution(int.Parse(solution));
+        //
+        // var count = 0;
+        // if (nums != null)
+        // {
+        //     var list = ShuffleValues(ParseJToken(nums));
+        //     var enumerable = list as int[] ?? list.ToArray();
+        //     _solutionNumbers = GetSolutionNumbers(enumerable, int.Parse(solution));
+        //     EventManager.RaiseEvent(GameEvents.PairsGoalDefined, new Dictionary<string, object>
+        //     {
+        //         ["pairsGoal"] = _solutionNumbers.Count / 2
+        //     });
+        //     Debug.Log($"Correct pairs: {_solutionNumbers.Count / 2}\ndata: {_solutionNumbers.ToJsonPretty()}");
+        //     
+        //     foreach (var n in enumerable)
+        //     {
+        //         _bubbles[count].gameObject.SetActive(true);
+        //         _bubbles[count].UpdateValue(n);
+        //         BubblesMap[_bubbles[count].Value] = _bubbles[count];
+        //         count++;
+        //     }
+        // }
+        // else
+        // {
+        //     Debug.LogError($"nums is null!!");
+        // }
+        //
+        // return _solutionNumbers;
+        return default;
     }
 
-    private void SpawnBubbles(List<int> numbers)
+    public void SpawnBubblesInt(GeneratedNumbersData<int> data, Action onComplete = default)
     {
         var count = 0;
-        if (numbers != null)
+        _solutionNumbers = data.CorrectNumbers;
+        EventManager.RaiseEvent(GameEvents.PairsGoalDefined, new Dictionary<string, object>
         {
-            _solutionNumbers = GetSolutionNumbers(enumerable, int.Parse(solution));
-            EventManager.RaiseEvent(GameEvents.PairsGoalDefined, new Dictionary<string, object>
-            {
-                ["pairsGoal"] = _solutionNumbers.Count / 2
-            });
-            Debug.Log($"Correct pairs: {_solutionNumbers.Count / 2}\ndata: {_solutionNumbers.ToJsonPretty()}");
-            
-            foreach (var n in enumerable)
-            {
-                _bubbles[count].gameObject.SetActive(true);
-                _bubbles[count].UpdateValue(n);
-                BubblesMap[_bubbles[count].Value] = _bubbles[count];
-                count++;
-            }
-        }
-        else
+            ["pairsGoal"] = _solutionNumbers.Count / 2
+        });
+        Debug.Log($"Correct pairs: {_solutionNumbers.Count / 2}\ndata: {_solutionNumbers.ToJsonPretty()}");
+        
+        // TODO: refactor for duplicate numbers allowed
+        
+        foreach (var n in data.TotalNumbers)
         {
-            Debug.LogError($"nums is null!!");
+            _bubbles[count].gameObject.SetActive(true);
+            _bubbles[count].UpdateValue(n);
+            BubblesMap[_bubbles[count].Value] = _bubbles[count];
+            count++;
         }
+        onComplete?.Invoke();
     }
     
     private void SpawnBubbles(List<float> numbers)
@@ -198,31 +196,31 @@ public class BubblesController : MonoBehaviour
 
     public async void TestApiRequest()
     {
-        Debug.Log("Sending request from bubble controller");
-        var prompt = ServiceLocator.Get<IPromptBuilderService>().BuildPromptSimple(314);
-        var content = await ServiceLocator.Get<IGeminiRequestService>().AsyncGeminiRequest(prompt);
-        Debug.Log($"Received request from bubble controller");
-
-        var data = ParseResponse(content);
-        var solution = "";
-        JToken nums = null;
-
-        foreach (var VARIABLE in data)
-        {
-            solution = VARIABLE.Key;
-            nums = VARIABLE.Value;
-        }
-        
-        if (nums != null)
-        {
-            var list = ShuffleValues(ParseJToken(nums));
-            var enumerable = list as int[] ?? list.ToArray();
-            var pairs = GetSolutionNumbers(enumerable, int.Parse(solution));
-            Debug.Log($"Correct pairs: {pairs.Count / 2}\ndata: {pairs.ToJsonPretty()}");
-        }
-        else
-        {
-            Debug.LogError($"nums is null!!");
-        }
+        // Debug.Log("Sending request from bubble controller");
+        // var prompt = ServiceLocator.Get<IPromptBuilderService>().BuildPromptSimple(314);
+        // var content = await ServiceLocator.Get<IGeminiRequestService>().AsyncGeminiRequest(prompt);
+        // Debug.Log($"Received request from bubble controller");
+        //
+        // var data = ParseResponse(content);
+        // var solution = "";
+        // JToken nums = null;
+        //
+        // foreach (var VARIABLE in data)
+        // {
+        //     solution = VARIABLE.Key;
+        //     nums = VARIABLE.Value;
+        // }
+        //
+        // if (nums != null)
+        // {
+        //     var list = ShuffleValues(ParseJToken(nums));
+        //     var enumerable = list as int[] ?? list.ToArray();
+        //     var pairs = GetSolutionNumbers(enumerable, int.Parse(solution));
+        //     Debug.Log($"Correct pairs: {pairs.Count / 2}\ndata: {pairs.ToJsonPretty()}");
+        // }
+        // else
+        // {
+        //     Debug.LogError($"nums is null!!");
+        // }
     }
 }

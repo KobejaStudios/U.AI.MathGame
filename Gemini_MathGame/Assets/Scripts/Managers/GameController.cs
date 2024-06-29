@@ -65,11 +65,13 @@ public class GameController : MonoBehaviour
         _scoreProgressController.ResetController();
         _solutionTargetController.ResetController();
         await _bubblesController.ResetBubblesViewAsync();
-        var prompt = ServiceLocator.Get<IPromptBuilderService>().BuildPromptSimple(314);
-        var content = await ServiceLocator.Get<IGeminiRequestService>().AsyncGeminiRequest(prompt);
-        _solutionNumbers = await _bubblesController.SpawnBubblesAsync(content);
-        Debug.Log($"done awaiting");
-        EventManager.RaiseEvent(GameEvents.RoundStarted);
+        var numbersData = 
+            ServiceLocator.Get<INumberGeneratorService>().GetNumbers(200, 40, 20, EquationOperation.Addition);
+        _bubblesController.SpawnBubblesInt(numbersData, () =>
+        {
+            Debug.Log($"done awaiting");
+            EventManager.RaiseEvent(GameEvents.RoundStarted);
+        });
     }
 
     private void RoundStart(Dictionary<string, object> context)
