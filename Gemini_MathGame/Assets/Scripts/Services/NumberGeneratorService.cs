@@ -31,8 +31,8 @@ public class NumberGeneratorService : INumberGeneratorService
         {
             case EquationOperation.Addition:
                 result = gameConfig.IsDuplicatesAllowed 
-                    ? GetAdditionNumberSet(gameConfig.SolutionTarget, gameConfig.NumberSetLength, gameConfig.CorrectNumbersLength) 
-                    : GetAdditionNumberList(gameConfig.SolutionTarget, gameConfig.NumberSetLength, gameConfig.CorrectNumbersLength);
+                    ? GetAdditionNumberList(gameConfig.SolutionTarget, gameConfig.NumberSetLength, gameConfig.CorrectNumbersLength)
+                    : GetAdditionNumberSet(gameConfig.SolutionTarget, gameConfig.NumberSetLength, gameConfig.CorrectNumbersLength);
                 break;
             case EquationOperation.Subtraction:
                 break;
@@ -78,17 +78,18 @@ public class NumberGeneratorService : INumberGeneratorService
         var totalNumbers = new List<int>();
 
         // iterate over the correctNumbers int by 2, creating pairs of correct bubbles
-        for (int i = 0; i < correctNumbers; i+= 2)
+        for (int i = 0; i < correctNumbers; i += 2)
         {
             var current = Random.Range(0, solutionTarget);
+            var compliment = solutionTarget - current;
 
-            while (hashSet.Contains(current))
+            while (hashSet.Contains(current) || hashSet.Contains(compliment))
             {
                 current = Random.Range(0, solutionTarget);
+                compliment = solutionTarget - current;
                 _currentResetCount++;
             }
-
-            var compliment = solutionTarget - current;
+            
             hashSet.Add(current);
             hashSet.Add(compliment);
         }
@@ -106,11 +107,10 @@ public class NumberGeneratorService : INumberGeneratorService
                 _currentResetCount++;
             }
 
-            remainders.Add(current);
+            hashSet.Add(current);
         }
         
-        totalNumbers.AddRange(solutionSet);
-        totalNumbers.AddRange(remainders);
+        totalNumbers.AddRange(hashSet);
 
         var data = new GeneratedNumbersData<int>
         {
@@ -126,9 +126,6 @@ public class NumberGeneratorService : INumberGeneratorService
         });
 
         return data;
-
-        // Debug.Log($"args0: {solutionTarget}, args1: {setLength}, args2: {correctNumbers}, remainderLength: {remainderLength}");
-        // Debug.Log($"time: {sw.Elapsed}, length: {result.Count}, resets: {_currentResetCount}\nsb: {sb}");
     }
     
     private GeneratedNumbersData<int> GetAdditionNumberList(int solutionTarget, int setLength, int correctNumbers)
