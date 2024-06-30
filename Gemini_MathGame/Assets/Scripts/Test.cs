@@ -2,15 +2,17 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class Test : MonoBehaviour
 {
+    [SerializeField] private Image _image;
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            GetSet();
+            SetImageColor();
         }
     }
 
@@ -30,5 +32,11 @@ public class Test : MonoBehaviour
             BubbleCollectionOrientation.Shuffled,
             false);
         //ServiceLocator.Get<INumberGeneratorService>().GetNumbers(gameData);
+    }
+
+    [ContextMenu("Set Image Color")]
+    private void SetImageColor()
+    {
+        _image.color = RandomColorSelector.Instance.GetColor();
     }
 }
