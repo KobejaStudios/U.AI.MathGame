@@ -11,7 +11,7 @@ public class GameConfig
 
     public GameConfig(
         int solutionTarget,
-        int numbersLength,
+        int numbersSetLength,
         int correctNumbers,
         EquationOperation equationOperation,
         BubbleCollectionOrientation bubbleOrientation,
@@ -19,7 +19,7 @@ public class GameConfig
         ) 
     {
         SolutionTarget = solutionTarget;
-        NumberSetLength = numbersLength;
+        NumberSetLength = numbersSetLength;
         CorrectNumbersLength = correctNumbers;
         EquationOperation = equationOperation;
         BubbleOrientation = bubbleOrientation;

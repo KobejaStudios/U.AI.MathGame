@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
@@ -10,6 +11,7 @@ using Random = UnityEngine.Random;
 public interface INumberGeneratorService
 {
     GeneratedNumbersData<int> GetNumbers(GameConfig gameConfig);
+    UniTask<GeneratedNumbersData<int>> GetNumbersAsync(GameConfig gameConfig);
 }
 
 public struct GeneratedNumbersData<T>
@@ -47,6 +49,71 @@ public class NumberGeneratorService : INumberGeneratorService
         return result;
     }
 
+    public async UniTask<GeneratedNumbersData<int>> GetNumbersAsync(GameConfig gameConfig)
+    {
+        return await UniTask.RunOnThreadPool(() =>
+        {
+            _currentResetCount = 0;
+            var setLength = gameConfig.NumberSetLength;
+            var correctNumbers = gameConfig.CorrectNumbersLength;
+            var solutionTarget = gameConfig.SolutionTarget;
+            var remainderLength = setLength - correctNumbers;
+            var maxRandomBound = solutionTarget + 1;
+            var hashSet = new HashSet<int>(setLength);
+            var remainders = new List<int>();
+        
+
+            // iterate over the correctNumbers int by 2, creating pairs of correct bubbles
+            for (int i = 0; i < correctNumbers; i += 2)
+            {
+                var current = _random.Next(maxRandomBound);
+                var compliment = solutionTarget - current;
+
+                while (hashSet.Contains(current) || current == compliment)
+                {
+                    current = _random.Next(maxRandomBound);
+                    compliment = solutionTarget - current;
+                    _currentResetCount++;
+                }
+
+                hashSet.Add(current);
+                hashSet.Add(compliment);
+            }
+
+            var solutionSet = new HashSet<int>(hashSet);
+        
+            // iterate over the remainder and just create random bubbles
+            for (int i = 0; i < remainderLength; i++)
+            {
+                var current = _random.Next(maxRandomBound);
+            
+                while (hashSet.Contains(current))
+                {
+                    current = _random.Next(maxRandomBound);
+                    _currentResetCount++;
+                }
+
+                hashSet.Add(current);
+                remainders.Add(current);
+            }
+
+            var data = new GeneratedNumbersData<int>
+            {
+                SolutionTarget = solutionTarget,
+                CorrectNumbers = solutionSet,
+                IncorrectNumbers = remainders,
+                TotalNumbers = hashSet.ToList()
+            };
+        
+            EventManager.RaiseEvent(GameEvents.NumberGenerationComplete, new Dictionary<string, object>
+            {
+                [GameParams.data] = data
+            });
+            
+            return data;
+        });
+    }
+
     #region Generics
 
     private List<T> ShuffleValues<T>(IEnumerable<T> values)
@@ -73,9 +140,9 @@ public class NumberGeneratorService : INumberGeneratorService
     {
         _currentResetCount = 0;
         var remainderLength = setLength - correctNumbers;
-        var hashSet = new HashSet<int>();
+        var hashSet = new HashSet<int>(setLength);
         var remainders = new List<int>();
-        var totalNumbers = new List<int>();
+        
 
         // iterate over the correctNumbers int by 2, creating pairs of correct bubbles
         for (int i = 0; i < correctNumbers; i += 2)
@@ -83,13 +150,13 @@ public class NumberGeneratorService : INumberGeneratorService
             var current = Random.Range(0, solutionTarget);
             var compliment = solutionTarget - current;
 
-            while (hashSet.Contains(current) || hashSet.Contains(compliment))
+            while (hashSet.Contains(current) || current == compliment)
             {
                 current = Random.Range(0, solutionTarget);
                 compliment = solutionTarget - current;
                 _currentResetCount++;
             }
-            
+
             hashSet.Add(current);
             hashSet.Add(compliment);
         }
@@ -108,16 +175,15 @@ public class NumberGeneratorService : INumberGeneratorService
             }
 
             hashSet.Add(current);
+            remainders.Add(current);
         }
-        
-        totalNumbers.AddRange(hashSet);
 
         var data = new GeneratedNumbersData<int>
         {
             SolutionTarget = solutionTarget,
             CorrectNumbers = solutionSet,
             IncorrectNumbers = remainders,
-            TotalNumbers = totalNumbers
+            TotalNumbers = hashSet.ToList()
         };
         
         EventManager.RaiseEvent(GameEvents.NumberGenerationComplete, new Dictionary<string, object>

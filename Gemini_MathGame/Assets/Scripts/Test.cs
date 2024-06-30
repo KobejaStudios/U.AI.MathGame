@@ -29,6 +29,6 @@ public class Test : MonoBehaviour
             EquationOperation.Addition,
             BubbleCollectionOrientation.Shuffled,
             false);
-        ServiceLocator.Get<INumberGeneratorService>().GetNumbers(gameData);
+        //ServiceLocator.Get<INumberGeneratorService>().GetNumbers(gameData);
     }
 }
