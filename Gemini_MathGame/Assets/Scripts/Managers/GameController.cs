@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
@@ -14,6 +15,8 @@ public class GameController : MonoBehaviour
     [SerializeField] private ScoreProgressController _scoreProgressController;
 
     private HashSet<int> _solutionNumbers = new();
+    private List<int> _totalNumbers = new();
+    private List<int> _remainderNumbers = new();
     
     public int SolutionTarget { get; set; }
 
@@ -55,6 +58,8 @@ public class GameController : MonoBehaviour
         {
             _solutionNumbers = data.CorrectNumbers;
             SolutionTarget = data.SolutionTarget;
+            _totalNumbers = data.TotalNumbers;
+            _remainderNumbers = data.IncorrectNumbers;
         }
     }
 
@@ -100,14 +105,34 @@ public class GameController : MonoBehaviour
     private void OnTimeExpired(Dictionary<string, object> arg0)
     {
         // TODO: validation? thoughts about strengthening these win/loss conditions
-        foreach (var bubble in _solutionNumbers)
+        // TODO: clean up this approach, was done quick and dirty for feedback purposes
+        var temp = new HashSet<int>(_solutionNumbers);
+        while (temp.Count > 0)
         {
-            var current = _bubblesController.BubblesMap[bubble];
-            if (current.gameObject.activeInHierarchy)
+            var current = temp.Last();
+            var compliment = SolutionTarget - current;
+            var currentBubble = _bubblesController.BubblesMap[current];
+            var complimentBubble = _bubblesController.BubblesMap[compliment];
+
+            if (temp.Contains(compliment))
             {
-                current.Image.color = Color.green;
+                temp.Remove(current);
+                temp.Remove(compliment);
+            }
+            
+            if (currentBubble.gameObject.activeInHierarchy && complimentBubble.gameObject.activeInHierarchy)
+            {
+                var color = RandomColorSelector.Instance.GetColor();
+                currentBubble.Image.color = color;
+                complimentBubble.Image.color = color;
             }
         }
+        
+        foreach (var n in _remainderNumbers)
+        {
+            _bubblesController.BubblesMap[n].SetBubbleAlpha(.1f);
+        }
+        
         EventManager.RaiseEvent(GameEvents.RoundLost);
     }
     

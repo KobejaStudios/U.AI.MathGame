@@ -12,6 +12,7 @@ public class NumberBubble : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _text;
     [SerializeField] private Image _image;
     [SerializeField] private Button _button;
+    [SerializeField] private CanvasGroup _canvasGroup;
 
     [SerializeField] private Sprite[] _spriteSheet;
     [SerializeField] private Color _baseColor;
@@ -145,12 +146,18 @@ public class NumberBubble : MonoBehaviour
         Image.color = _isShader ? _baseColorIfShader : _baseColor;
     }
 
+    public void SetBubbleAlpha(float value)
+    {
+        _canvasGroup.alpha = value;
+    }
+
     public void ResetBubble()
     {
         Value = 0;
         State = BubbleState.NotClicked;
         Image.color = _isShader ? _baseColorIfShader : _baseColor;
         _text.text = Value.ToString();
+        _canvasGroup.alpha = 1f;
         gameObject.SetActive(false);
     }
 
