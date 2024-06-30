@@ -64,6 +64,7 @@ public class GameController : MonoBehaviour
         _scoreProgressController.ResetController();
         _solutionTargetController.ResetController();
         await _bubblesController.ResetBubblesViewAsync();
+        
         // TODO: build this data from the menus
         var gameData = new GameConfig(
             200,
@@ -73,8 +74,10 @@ public class GameController : MonoBehaviour
             BubbleCollectionOrientation.Shuffled,
             false
             );
+        
         var numbersData = 
-            ServiceLocator.Get<INumberGeneratorService>().GetNumbers(gameData);
+            await ServiceLocator.Get<INumberGeneratorService>().Async_GetNumbersInt(gameData);
+        
         _bubblesController.SpawnBubblesInt(numbersData, () =>
         {
             Debug.Log($"done awaiting");

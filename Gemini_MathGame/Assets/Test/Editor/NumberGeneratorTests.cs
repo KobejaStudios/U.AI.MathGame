@@ -53,7 +53,7 @@ public class NumberGeneratorTests
                 BubbleCollectionOrientation.Shuffled,
                 false
             );
-            var result = await service.GetNumbersAsync(data);
+            var result = await service.Async_GetNumbersInt(data);
             Assert.IsTrue(data.SolutionTarget == result.SolutionTarget);
             Assert.IsTrue(data.NumberSetLength == result.TotalNumbers.Count);
             Assert.IsTrue(data.CorrectNumbersLength == result.CorrectNumbers.Count);

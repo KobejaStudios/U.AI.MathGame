@@ -11,7 +11,7 @@ using Random = UnityEngine.Random;
 public interface INumberGeneratorService
 {
     GeneratedNumbersData<int> GetNumbers(GameConfig gameConfig);
-    UniTask<GeneratedNumbersData<int>> GetNumbersAsync(GameConfig gameConfig);
+    UniTask<GeneratedNumbersData<int>> Async_GetNumbersInt(GameConfig gameConfig);
 }
 
 public struct GeneratedNumbersData<T>
@@ -49,7 +49,7 @@ public class NumberGeneratorService : INumberGeneratorService
         return result;
     }
 
-    public async UniTask<GeneratedNumbersData<int>> GetNumbersAsync(GameConfig gameConfig)
+    public async UniTask<GeneratedNumbersData<int>> Async_GetNumbersInt(GameConfig gameConfig)
     {
         return await UniTask.RunOnThreadPool(() =>
         {
@@ -97,12 +97,20 @@ public class NumberGeneratorService : INumberGeneratorService
                 remainders.Add(current);
             }
 
+            var totalNumbers = hashSet.ToList();
+
+            // TODO: switch statement with all orientation types
+            if (gameConfig.BubbleOrientation == BubbleCollectionOrientation.Shuffled)
+            {
+                ShuffleValues(totalNumbers);
+            }
+
             var data = new GeneratedNumbersData<int>
             {
                 SolutionTarget = solutionTarget,
                 CorrectNumbers = solutionSet,
                 IncorrectNumbers = remainders,
-                TotalNumbers = hashSet.ToList()
+                TotalNumbers = totalNumbers
             };
         
             EventManager.RaiseEvent(GameEvents.NumberGenerationComplete, new Dictionary<string, object>
@@ -130,6 +138,16 @@ public class NumberGeneratorService : INumberGeneratorService
         }
 
         return newList;
+    }
+    
+    private void ShuffleValues<T>(List<T> values)
+    {
+        var n = values.Count;
+        for (int i = n - 1; i > 0; i--)
+        {
+            var j = _random.Next(i + 1);
+            (values[i], values[j]) = (values[j], values[i]);
+        }
     }
 
     #endregion
