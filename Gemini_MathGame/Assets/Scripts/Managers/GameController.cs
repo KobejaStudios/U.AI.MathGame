@@ -74,6 +74,11 @@ public class GameController : MonoBehaviour
             _totalNumbers = data.TotalNumbers;
             _remainderNumbers = data.IncorrectNumbers;
         }
+        
+        EventManager.RaiseEvent(GameEvents.SolutionDefined, new Dictionary<string, object>
+        {
+            [GameParams.solution] = SolutionTarget
+        });
     }
 
     public async void StartRound()
@@ -88,7 +93,7 @@ public class GameController : MonoBehaviour
         
         var numbersData = 
             await ServiceLocator.Get<INumberGeneratorService>().Async_GetNumbersInt(gameConfig);
-        
+
         _bubblesController.SpawnBubblesInt(numbersData, () =>
         {
             Debug.Log($"done awaiting");

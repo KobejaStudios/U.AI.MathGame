@@ -51,7 +51,7 @@ public class NumberGeneratorService : INumberGeneratorService
 
     public async UniTask<GeneratedNumbersData<int>> Async_GetNumbersInt(GameConfig gameConfig)
     {
-        return await UniTask.RunOnThreadPool(() =>
+        return await UniTask.RunOnThreadPool(async () =>
         {
             _currentResetCount = 0;
             var setLength = gameConfig.NumberSetLength;
@@ -112,7 +112,9 @@ public class NumberGeneratorService : INumberGeneratorService
                 IncorrectNumbers = remainders,
                 TotalNumbers = totalNumbers
             };
-        
+
+            await UniTask.SwitchToMainThread();
+            
             EventManager.RaiseEvent(GameEvents.NumberGenerationComplete, new Dictionary<string, object>
             {
                 [GameParams.data] = data

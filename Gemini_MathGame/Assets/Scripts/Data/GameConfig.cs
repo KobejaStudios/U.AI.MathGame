@@ -24,10 +24,5 @@ public class GameConfig
         EquationOperation = equationOperation;
         BubbleOrientation = bubbleOrientation;
         IsDuplicatesAllowed = isDuplicatesAllowed;
-        
-        EventManager.RaiseEvent(GameEvents.SolutionDefined, new Dictionary<string, object>
-        {
-            [GameParams.solution] = SolutionTarget
-        });
     }
 }

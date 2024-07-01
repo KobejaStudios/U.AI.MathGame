@@ -19,7 +19,7 @@ public class SolutionTargetController : MonoBehaviour
     private void Start()
     {
         EventManager.AddListener(GameEvents.BubbleClicked, OnNumberBubbleClicked);
-        EventManager.AddListener(GameEvents.SolutionDefined, OnSolutionDefined);
+        EventManager.AddListener(GameEvents.NumberGenerationComplete, OnNumbersGenerated);
         EventManager.AddListener(GameEvents.RoundWon, OnRoundWon);
         EventManager.AddListener(GameEvents.RoundLost, OnRoundLost);
     }
@@ -27,7 +27,7 @@ public class SolutionTargetController : MonoBehaviour
     private void OnDestroy()
     {
         EventManager.RemoveListener(GameEvents.BubbleClicked, OnNumberBubbleClicked);
-        EventManager.RemoveListener(GameEvents.SolutionDefined, OnSolutionDefined);
+        EventManager.RemoveListener(GameEvents.NumberGenerationComplete, OnNumbersGenerated);
         EventManager.RemoveListener(GameEvents.RoundWon, OnRoundWon);
         EventManager.RemoveListener(GameEvents.RoundLost, OnRoundLost);
     }
@@ -55,16 +55,16 @@ public class SolutionTargetController : MonoBehaviour
         _solutionTargetText.text = "Round Won!";
     }
 
-    private void OnSolutionDefined(Dictionary<string, object> arg0)
+    private void OnNumbersGenerated(Dictionary<string, object> arg0)
     {
-        if (arg0.TryGetAs(GameParams.solution, out string solution))
+        if (arg0.TryGetAs(GameParams.data, out GeneratedNumbersData<int> data))
         {
-            _solutionTarget = solution;
+            _solutionTarget = data.SolutionTarget.ToString();
             ResetEquationStringAndState();
         }
         else
         {
-            Debug.LogError($"Could not find value for key: 'solution' in data: {arg0.ToJsonPretty()}");
+            Debug.LogError($"Could not find value for key: {GameParams.data} in data: {arg0.ToJsonPretty()}");
         }
     }
 
