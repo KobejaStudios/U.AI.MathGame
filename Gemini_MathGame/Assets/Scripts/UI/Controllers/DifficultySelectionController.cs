@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using TMPro;
@@ -10,21 +8,26 @@ public class DifficultySelectionController : MonoBehaviour
 {
     [Header("Solution Target")] 
     [SerializeField] private TextMeshProUGUI _valueDisplay;
-    [SerializeField] private Slider _slider;
+    [SerializeField] private Slider _solutionTargetSlider;
+
+    [Header("Control Buttons")] 
+    [SerializeField] private Button _submitButton;
 
     private void Awake()
     {
-        _slider.onValueChanged.AddListener(x =>
+        _solutionTargetSlider.onValueChanged.AddListener(x =>
         {
             _valueDisplay.text = x.ToString(CultureInfo.InvariantCulture);
         });
-        _slider.onValueChanged?.Invoke(_slider.value);
+        _solutionTargetSlider.onValueChanged?.Invoke(_solutionTargetSlider.value);
+        
+        _submitButton.onClick.AddListener(SubmitGameConfig);
     }
 
     private void SubmitGameConfig()
     {
         var config = new GameConfig
-            (200,
+            ((int)_solutionTargetSlider.value,
             32,
             16,
             EquationOperation.Addition,
