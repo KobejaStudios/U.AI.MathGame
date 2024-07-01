@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviour
 {
@@ -17,6 +18,7 @@ public class GameController : MonoBehaviour
     private HashSet<int> _solutionNumbers = new();
     private List<int> _totalNumbers = new();
     private List<int> _remainderNumbers = new();
+    private Queue<GameConfig> _gameConfigs = new();
     
     public int SolutionTarget { get; set; }
 
@@ -40,6 +42,7 @@ public class GameController : MonoBehaviour
         EventManager.AddListener(GameEvents.ScoreAdded, OnScoreAdded);
         EventManager.AddListener(GameEvents.TimeExpired, OnTimeExpired);
         EventManager.AddListener(GameEvents.NumberGenerationComplete, OnNumberGenerationComplete);
+        EventManager.AddListener(GameEvents.GameConfigDefined, OnGameConfigDefined);
     }
 
     private void OnDestroy()
@@ -50,6 +53,16 @@ public class GameController : MonoBehaviour
         EventManager.RemoveListener(GameEvents.ScoreAdded, OnScoreAdded);
         EventManager.RemoveListener(GameEvents.TimeExpired, OnTimeExpired);
         EventManager.RemoveListener(GameEvents.NumberGenerationComplete, OnNumberGenerationComplete);
+        EventManager.RemoveListener(GameEvents.GameConfigDefined, OnGameConfigDefined);
+    }
+    
+    private void OnGameConfigDefined(Dictionary<string, object> arg0)
+    {
+        if (arg0.TryGetAs(GameParams.gameConfig, out GameConfig gameConfig))
+        {
+            _gameConfigs.Enqueue(gameConfig);
+            Debug.Log($"config: {gameConfig.ToJsonPretty()} added to queue. Queue length: {_gameConfigs.Count}");
+        }
     }
     
     private void OnNumberGenerationComplete(Dictionary<string, object> arg0)
@@ -70,18 +83,11 @@ public class GameController : MonoBehaviour
         _solutionTargetController.ResetController();
         await _bubblesController.ResetBubblesViewAsync();
         
-        // TODO: build this data from the menus
-        var gameData = new GameConfig(
-            200,
-            40,
-            20,
-            EquationOperation.Addition,
-            BubbleCollectionOrientation.Shuffled,
-            false
-            );
+        var gameConfig = 
+            _gameConfigs.Count <= 0 ? GetRandomConfig() : _gameConfigs.Dequeue();
         
         var numbersData = 
-            await ServiceLocator.Get<INumberGeneratorService>().Async_GetNumbersInt(gameData);
+            await ServiceLocator.Get<INumberGeneratorService>().Async_GetNumbersInt(gameConfig);
         
         _bubblesController.SpawnBubblesInt(numbersData, () =>
         {
@@ -185,4 +191,21 @@ public class GameController : MonoBehaviour
     {
         
     }
+
+    #region Helpers
+
+    private GameConfig GetRandomConfig()
+    {
+        return new GameConfig
+        (
+            Random.Range(200, 500),
+            32,
+            16,
+            EquationOperation.Addition,
+            BubbleCollectionOrientation.Shuffled,
+            false
+            );
+    }
+
+    #endregion
 }

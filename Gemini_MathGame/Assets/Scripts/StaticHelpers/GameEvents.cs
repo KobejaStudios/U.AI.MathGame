@@ -9,6 +9,7 @@ public static class GameEvents
     public const string ScoreAdded = "ScoreAdded";
     public const string StartRound = "StartRound";
     public const string RoundStarted = "RoundStarted";
+    public const string GameConfigDefined = "GameConfigDefined";
     public const string NumberGenerationComplete = "NumberGenerationComplete"; // payload: GeneratedNumbersData<T> data
     
     // TODO: not sure I'm handling these win and loss events as ideally as I can, revisit in future
@@ -23,6 +24,7 @@ public static class GameEvents
 
 public static class GameParams
 {
+    public const string gameConfig = "gameConfig";
     public const string solution = "solution";
     public const string bubbles = "bubbles";
     public const string currentScore = "currentScore";
