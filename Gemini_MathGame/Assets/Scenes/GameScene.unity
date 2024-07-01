@@ -3084,7 +3084,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 1711510537}
+  m_Material: {fileID: 1710942052}
   m_Color: {r: 0.3647059, g: 0.41176474, b: 0.45882356, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -15687,7 +15687,7 @@ MonoBehaviour:
   _bottomHalfImage: {fileID: 2027253613}
   _sandParticles: {fileID: 642852132}
   _lowTimeColor: {r: 1, g: 0.4117647, b: 0.4117647, a: 1}
---- !u!21 &1711510537
+--- !u!21 &1710942052
 Material:
   serializedVersion: 8
   m_ObjectHideFlags: 0
