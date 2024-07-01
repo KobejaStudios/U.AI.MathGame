@@ -64,7 +64,7 @@ public class HourglassController : MonoBehaviour
             await UniTask.Delay(1000, cancellationToken: _cts.Token);
             _time = _time.Subtract(TimeSpan.FromMilliseconds(1000));
             _timerText.text = _time.ToString(@"mm\:ss");
-            if (_time.Seconds <= 10)
+            if (_time.TotalSeconds <= 10)
             {
                 _timerText.color = _lowTimeColor;
             }
