@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -20,6 +21,15 @@ public class DifficultySelectionController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _solutionSetLengthDisplay;
     [SerializeField] private Slider _solutionSetLengthSlider;
 
+    [Header("Equation Operation")]
+    [SerializeField] private TMP_Dropdown _equationOperationDropdown;
+    
+    [Header("Bubbles Sort Order")]
+    [SerializeField] private TMP_Dropdown _bubblesSortOrderDropdown;
+
+    [Header("Allow Duplicates")] 
+    [SerializeField] private Toggle _allowDuplicatesToggle;
+
     [Header("Control Buttons")] 
     [SerializeField] private Button _submitButton;
 
@@ -35,6 +45,19 @@ public class DifficultySelectionController : MonoBehaviour
         _solutionSetLengthSlider.onValueChanged.AddListener(OnSolutionSetLengthChanged);
         
         _submitButton.onClick.AddListener(SubmitGameConfig);
+        InitDropdowns();
+    }
+
+    private void InitDropdowns()
+    {
+        var equationOperationNames = Enum.GetNames(typeof(EquationOperation)).ToList();
+        var bubblesOrientationNames = Enum.GetNames(typeof(BubbleCollectionOrientation)).ToList();
+        
+        _equationOperationDropdown.ClearOptions();
+        _bubblesSortOrderDropdown.ClearOptions();
+        
+        _equationOperationDropdown.AddOptions(equationOperationNames);
+        _bubblesSortOrderDropdown.AddOptions(bubblesOrientationNames);
     }
 
     private void OnNumberSetLengthChanged(float value)
@@ -58,12 +81,12 @@ public class DifficultySelectionController : MonoBehaviour
 
     private void SubmitGameConfig()
     {
-        var config = new GameConfig
-            ((int)_solutionTargetSlider.value,
-                (int)_numberSetLengthSlider.value,
-                (int)_solutionSetLengthSlider.value,
+        var config = new GameConfig(
+            (int)_solutionTargetSlider.value,
+            (int)_numberSetLengthSlider.value, 
+            (int)_solutionSetLengthSlider.value,
             EquationOperation.Addition,
-            BubbleCollectionOrientation.Shuffled,
+            (BubbleCollectionOrientation)_bubblesSortOrderDropdown.value,
             false
             );
         

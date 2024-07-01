@@ -99,10 +99,19 @@ public class NumberGeneratorService : INumberGeneratorService
 
             var totalNumbers = hashSet.ToList();
 
-            // TODO: switch statement with all orientation types
-            if (gameConfig.BubbleOrientation == BubbleCollectionOrientation.Shuffled)
+            switch (gameConfig.BubbleOrientation)
             {
-                ShuffleValues(totalNumbers);
+                case BubbleCollectionOrientation.Shuffled:
+                    ShuffleValues(totalNumbers);
+                    break;
+                case BubbleCollectionOrientation.LowSorted:
+                    totalNumbers.Sort((x, y) => x.CompareTo(y));
+                    break;
+                case BubbleCollectionOrientation.HighSorted:
+                    totalNumbers.Sort((x, y) => y.CompareTo(x));
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
             var data = new GeneratedNumbersData<int>
