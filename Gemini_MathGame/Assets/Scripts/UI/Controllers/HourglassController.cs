@@ -52,6 +52,7 @@ public class HourglassController : MonoBehaviour
     {
         _cts?.Cancel();
         _goalReached = true;
+        StopSandAnimation();
     }
 
     private async void OnRoundStarted(Dictionary<string, object> arg0)
@@ -59,7 +60,7 @@ public class HourglassController : MonoBehaviour
         _time = TimeSpan.FromSeconds(_timerSeconds);
         _timerText.text = _time.ToString(@"mm\:ss");
         StartSandAnimation(_timerSeconds);
-        while (_time > TimeSpan.Zero || _goalReached)
+        while (_time > TimeSpan.Zero && !_goalReached)
         {
             await UniTask.Delay(1000, cancellationToken: _cts.Token);
             _time = _time.Subtract(TimeSpan.FromMilliseconds(1000));
@@ -88,7 +89,6 @@ public class HourglassController : MonoBehaviour
     {
         _sandMoveMotionHandles?.Cancel();
         _sandParticles.Stop();
-        _sandParticles.gameObject.SetActive(false);
     }
 
     private void StartSandAnimation(float duration)
