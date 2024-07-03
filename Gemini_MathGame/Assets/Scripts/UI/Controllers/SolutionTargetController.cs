@@ -19,7 +19,7 @@ public class SolutionTargetController : MonoBehaviour
     private void Start()
     {
         EventManager.AddListener(GameEvents.BubbleClicked, OnNumberBubbleClicked);
-        EventManager.AddListener(GameEvents.NumberGenerationComplete, OnNumbersGenerated);
+        EventManager.AddListener(GameEvents.IntNumberGenerationComplete, OnNumbersGenerated);
         EventManager.AddListener(GameEvents.RoundWon, OnRoundWon);
         EventManager.AddListener(GameEvents.RoundLost, OnRoundLost);
     }
@@ -27,7 +27,7 @@ public class SolutionTargetController : MonoBehaviour
     private void OnDestroy()
     {
         EventManager.RemoveListener(GameEvents.BubbleClicked, OnNumberBubbleClicked);
-        EventManager.RemoveListener(GameEvents.NumberGenerationComplete, OnNumbersGenerated);
+        EventManager.RemoveListener(GameEvents.IntNumberGenerationComplete, OnNumbersGenerated);
         EventManager.RemoveListener(GameEvents.RoundWon, OnRoundWon);
         EventManager.RemoveListener(GameEvents.RoundLost, OnRoundLost);
     }

@@ -10,7 +10,7 @@ public static class GameEvents
     public const string StartRound = "StartRound";
     public const string RoundStarted = "RoundStarted";
     public const string GameConfigDefined = "GameConfigDefined";
-    public const string NumberGenerationComplete = "NumberGenerationComplete"; // payload: GeneratedNumbersData<T> data
+    public const string IntNumberGenerationComplete = "IntNumberGenerationComplete"; // payload: GeneratedNumbersData<int> data
     
     // TODO: not sure I'm handling these win and loss events as ideally as I can, revisit in future
     public const string RoundWon = "RoundWon";

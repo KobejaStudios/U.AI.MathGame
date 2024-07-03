@@ -41,7 +41,7 @@ public class GameController : MonoBehaviour
         EventManager.AddListener(GameEvents.RoundStarted, RoundStart);
         EventManager.AddListener(GameEvents.ScoreAdded, OnScoreAdded);
         EventManager.AddListener(GameEvents.TimeExpired, OnTimeExpired);
-        EventManager.AddListener(GameEvents.NumberGenerationComplete, OnNumberGenerationComplete);
+        EventManager.AddListener(GameEvents.IntNumberGenerationComplete, OnNumberGenerationComplete);
         EventManager.AddListener(GameEvents.GameConfigDefined, OnGameConfigDefined);
     }
 
@@ -52,7 +52,7 @@ public class GameController : MonoBehaviour
         EventManager.RemoveListener(GameEvents.RoundStarted, RoundStart);
         EventManager.RemoveListener(GameEvents.ScoreAdded, OnScoreAdded);
         EventManager.RemoveListener(GameEvents.TimeExpired, OnTimeExpired);
-        EventManager.RemoveListener(GameEvents.NumberGenerationComplete, OnNumberGenerationComplete);
+        EventManager.RemoveListener(GameEvents.IntNumberGenerationComplete, OnNumberGenerationComplete);
         EventManager.RemoveListener(GameEvents.GameConfigDefined, OnGameConfigDefined);
     }
     
@@ -92,7 +92,7 @@ public class GameController : MonoBehaviour
             _gameConfigs.Count <= 0 ? GetRandomConfig() : _gameConfigs.Dequeue();
         
         var numbersData = 
-            await ServiceLocator.Get<INumberGeneratorService>().Async_GetNumbersInt(gameConfig);
+            await ServiceLocator.Get<INumberGeneratorService>().Async_GetAdditionNumbersInt(gameConfig);
 
         _bubblesController.SpawnBubblesInt(numbersData, () =>
         {

@@ -6,7 +6,7 @@ using UnityEngine;
 public class NumberGeneratorTests
 {
     [Test]
-    public void NumberGenerator_StressTest()
+    public async void NumberGenerator_StressTest()
     {
         INumberGeneratorService service = new NumberGeneratorService();
 
@@ -24,7 +24,7 @@ public class NumberGeneratorTests
                 BubbleCollectionOrientation.Shuffled,
                 false
                 );
-            var result = service.GetNumbers(data);
+            var result = await service.Async_GetAdditionNumbersInt(data);
             Assert.IsTrue(data.SolutionTarget == result.SolutionTarget);
             Assert.IsTrue(data.NumberSetLength == result.TotalNumbers.Count);
             Assert.IsTrue(data.CorrectNumbersLength == result.CorrectNumbers.Count);
@@ -53,7 +53,7 @@ public class NumberGeneratorTests
                 BubbleCollectionOrientation.Shuffled,
                 false
             );
-            var result = await service.Async_GetNumbersInt(data);
+            var result = await service.Async_GetAdditionNumbersInt(data);
             Assert.IsTrue(data.SolutionTarget == result.SolutionTarget);
             Assert.IsTrue(data.NumberSetLength == result.TotalNumbers.Count);
             Assert.IsTrue(data.CorrectNumbersLength == result.CorrectNumbers.Count);
@@ -64,7 +64,7 @@ public class NumberGeneratorTests
     }
 
     [Test]
-    public void NumberGeneratorResultQueue()
+    public async void NumberGeneratorResultQueue()
     {
         var queue = new Queue<GeneratedNumbersData<int>>();
         INumberGeneratorService service = new NumberGeneratorService();
@@ -79,7 +79,7 @@ public class NumberGeneratorTests
                 BubbleCollectionOrientation.Shuffled,
                 false
             );
-            queue.Enqueue(service.GetNumbers(data));
+            queue.Enqueue(await service.Async_GetAdditionNumbersInt(data));
         }
 
         while (queue.Count > 0)
