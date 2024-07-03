@@ -38,6 +38,7 @@ public class DifficultySelectionController : MonoBehaviour
         _solutionTargetSlider.onValueChanged.AddListener(x =>
         {
             _solutionTargetDisplay.text = x.ToString(CultureInfo.InvariantCulture);
+            _numberSetLengthSlider.maxValue = MathF.Min(42, x);
         });
         _solutionTargetSlider.onValueChanged?.Invoke(_solutionTargetSlider.value);
         
