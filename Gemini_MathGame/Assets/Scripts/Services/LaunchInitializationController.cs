@@ -12,5 +12,6 @@ public class LaunchInitializationController : MonoBehaviour
         ServiceLocator.CreateAndRegisterService<IGeminiRequestService, GeminiRequestService>();
         ServiceLocator.CreateAndRegisterService<IPromptBuilderService, PromptBuilderService>();
         ServiceLocator.CreateAndRegisterService<INumberGeneratorService, NumberGeneratorService>();
+        ServiceLocator.CreateAndRegisterService<IPlayerStatisticsService, PlayerStatisticsService>();
     }
 }
