@@ -1,6 +1,9 @@
-using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// possible future expansion is to create an interface for configs to allow for multiple config definitions
+/// like duplicates allowed, etc...
+/// </summary>
 public class GameConfig
 {
     public int SolutionTarget { get; private set; }
