@@ -203,9 +203,9 @@ public class GameController : MonoBehaviour
     {
         return new GameConfig
         (
-            12,
-            12,
-            12,
+            25,
+            17,
+            11,
             EquationOperation.Addition,
             BubbleCollectionOrientation.Shuffled,
             false

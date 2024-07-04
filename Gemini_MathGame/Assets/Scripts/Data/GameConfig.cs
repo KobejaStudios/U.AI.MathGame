@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 public class GameConfig
 {
@@ -8,6 +9,7 @@ public class GameConfig
     public EquationOperation EquationOperation { get; private set; }
     public BubbleCollectionOrientation BubbleOrientation { get; private set; }
     public bool IsDuplicatesAllowed { get; private set; }
+    private const int MultipleOf = 2;
 
     /// <summary>
     /// when building a config, we currently do not support duplicate bubbles
@@ -32,11 +34,46 @@ public class GameConfig
         bool isDuplicatesAllowed
         ) 
     {
+        ValidateAndCorrectProperties(solutionTarget, ref numbersSetLength, ref correctNumbers);
+        
         SolutionTarget = solutionTarget;
         NumberSetLength = numbersSetLength;
         CorrectNumbersLength = correctNumbers;
         EquationOperation = equationOperation;
         BubbleOrientation = bubbleOrientation;
         IsDuplicatesAllowed = isDuplicatesAllowed;
+    }
+
+    private void ValidateAndCorrectProperties(int solutionTarget, ref int numbersSetLength, ref int correctNumbers)
+    {
+        if (numbersSetLength > solutionTarget)
+        {
+            Debug.LogWarning($"'numbersSetLength' cannot be greater than 'solutionTarget'. 'numbersSetLength' " +
+                             $"has been lowered from: {numbersSetLength} to: {solutionTarget}");
+            numbersSetLength = solutionTarget;
+        }
+        
+        if (numbersSetLength % MultipleOf != 0)
+        {
+            var prev = numbersSetLength;
+            numbersSetLength = (int)Mathf.Round(numbersSetLength / (float)MultipleOf) * MultipleOf;
+            Debug.LogWarning($"'numbersSetLength' MUST be a multiple of 2. 'correctNumbers' " +
+                             $"has been modified from: {prev} to: {numbersSetLength}");
+        }
+
+        if (correctNumbers > numbersSetLength)
+        {
+            Debug.LogWarning($"'correctNumbers' cannot be greater than 'numbersSetLength'. 'correctNumbers' " +
+                             $"has been lowered from: {correctNumbers} to: {numbersSetLength}");
+            correctNumbers = numbersSetLength;
+        }
+
+        if (correctNumbers % MultipleOf != 0)
+        {
+            var prev = correctNumbers;
+            correctNumbers = (int)Mathf.Round(correctNumbers / (float)MultipleOf) * MultipleOf;
+            Debug.LogWarning($"'correctNumbers' MUST be a multiple of 2. 'correctNumbers' " +
+                             $"has been modified from: {prev} to: {correctNumbers}");
+        }
     }
 }
