@@ -16,11 +16,11 @@ public class GameController : MonoBehaviour
     [SerializeField] private ScoreProgressController _scoreProgressController;
 
     private IPlayerStatisticsService _statistics;
+    private IGameConfigService _gameConfigService;
 
     private HashSet<int> _solutionNumbers = new();
     private List<int> _totalNumbers = new();
     private List<int> _remainderNumbers = new();
-    private Queue<GameConfig> _gameConfigs = new();
     
     public int SolutionTarget { get; set; }
 
@@ -39,6 +39,7 @@ public class GameController : MonoBehaviour
     private void Start()
     {
         _statistics = ServiceLocator.Get<IPlayerStatisticsService>();
+        _gameConfigService = ServiceLocator.Get<IGameConfigService>();
         EventManager.AddListener(GameEvents.BubbleClicked, BubbleClicked);
         EventManager.AddListener(GameEvents.SolutionEvaluated, OnSolutionEvaluated);
         EventManager.AddListener(GameEvents.RoundStarted, RoundStart);
@@ -63,8 +64,8 @@ public class GameController : MonoBehaviour
     {
         if (arg0.TryGetAs(GameParams.gameConfig, out GameConfig gameConfig))
         {
-            _gameConfigs.Enqueue(gameConfig);
-            Debug.Log($"config: {gameConfig.ToJsonPretty()} added to queue. Queue length: {_gameConfigs.Count}");
+            _gameConfigService.EnqueueGameConfig(gameConfig);
+            Debug.Log($"config: {gameConfig.ToJsonPretty()} added to queue. Queue length: {_gameConfigService.GetQueueLength()}");
         }
     }
     
@@ -90,9 +91,8 @@ public class GameController : MonoBehaviour
         _scoreProgressController.ResetController();
         _solutionTargetController.ResetController();
         await _bubblesController.ResetBubblesViewAsync();
-        
-        var gameConfig = 
-            _gameConfigs.Count <= 0 ? GetRandomConfig() : _gameConfigs.Dequeue();
+
+        var gameConfig = _gameConfigService.GetGameConfig();
         
         var numbersData = 
             await ServiceLocator.Get<INumberGeneratorService>().Async_GetAdditionNumbersInt(gameConfig);
@@ -204,18 +204,7 @@ public class GameController : MonoBehaviour
 
     #region Helpers
 
-    private GameConfig GetRandomConfig()
-    {
-        return new GameConfig
-        (
-            25,
-            17,
-            11,
-            EquationOperation.Addition,
-            BubbleCollectionOrientation.Shuffled,
-            false
-            );
-    }
+    
 
     #endregion
 }
