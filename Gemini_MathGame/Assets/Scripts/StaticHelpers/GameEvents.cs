@@ -1,4 +1,4 @@
-public static class GameEvents
+public partial class GameEvents
 {
     public const string SolutionDefined = "SolutionDefined";
     public const string PairsGoalDefined = "PairsGoalDefined";
@@ -13,6 +13,7 @@ public static class GameEvents
     public const string IntNumberGenerationComplete = "IntNumberGenerationComplete"; // payload: GeneratedNumbersData<int> data
     
     // TODO: not sure I'm handling these win and loss events as ideally as I can, revisit in future
+    public const string StatisticChanged = "StatisticChanged"; // payload: string statisticName, int statisticValue
     public const string RoundWon = "RoundWon";
     public const string RoundLost = "RoundLost";
     public const string ScoreGoalReached = "ScoreGoalReached";
@@ -22,7 +23,7 @@ public static class GameEvents
     public const string TimeRunningOut = "TimeRunningOut";
 }
 
-public static class GameParams
+public partial class GameParams
 {
     public const string gameConfig = "gameConfig";
     public const string solution = "solution";

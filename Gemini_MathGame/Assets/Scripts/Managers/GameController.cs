@@ -15,6 +15,8 @@ public class GameController : MonoBehaviour
     [SerializeField] private HourglassController _hourglassController;
     [SerializeField] private ScoreProgressController _scoreProgressController;
 
+    private IPlayerStatisticsService _statistics;
+
     private HashSet<int> _solutionNumbers = new();
     private List<int> _totalNumbers = new();
     private List<int> _remainderNumbers = new();
@@ -36,6 +38,7 @@ public class GameController : MonoBehaviour
 
     private void Start()
     {
+        _statistics = ServiceLocator.Get<IPlayerStatisticsService>();
         EventManager.AddListener(GameEvents.BubbleClicked, BubbleClicked);
         EventManager.AddListener(GameEvents.SolutionEvaluated, OnSolutionEvaluated);
         EventManager.AddListener(GameEvents.RoundStarted, RoundStart);
@@ -105,6 +108,7 @@ public class GameController : MonoBehaviour
     {
         // spawn bubbles
         // init UI
+        _statistics.IncrementStatistic(GameParams.gamesAttempted, 1);
     }
     
     private void BubbleClicked(Dictionary<string, object> context)
@@ -157,6 +161,7 @@ public class GameController : MonoBehaviour
                 Debug.Log("Winner!");
                 EventManager.RaiseEvent(GameEvents.ScoreGoalReached);
                 EventManager.RaiseEvent(GameEvents.RoundWon);
+                _statistics.IncrementStatistic(GameParams.gamesWon, 1);
             }
         }
     }
