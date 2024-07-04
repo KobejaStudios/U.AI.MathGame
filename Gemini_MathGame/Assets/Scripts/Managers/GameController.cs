@@ -10,10 +10,12 @@ using Random = UnityEngine.Random;
 public class GameController : MonoBehaviour
 {
     public static GameController Instance;
+    [Header("UI Controllers")]
     [SerializeField] private BubblesController _bubblesController;
     [SerializeField] private SolutionTargetController _solutionTargetController;
     [SerializeField] private HourglassController _hourglassController;
     [SerializeField] private ScoreProgressController _scoreProgressController;
+    [SerializeField] private CountdownController _countdownController;
 
     private IPlayerStatisticsService _statistics;
     private IGameConfigService _gameConfigService;
@@ -96,6 +98,11 @@ public class GameController : MonoBehaviour
         
         var numbersData = 
             await ServiceLocator.Get<INumberGeneratorService>().Async_GetAdditionNumbersInt(gameConfig);
+
+        await _countdownController.Async_StartCountdown(
+            new Queue<string>(new[] { "3", "2", "1", "GO!" }),
+            800
+            );
 
         _bubblesController.SpawnBubblesInt(numbersData, () =>
         {
