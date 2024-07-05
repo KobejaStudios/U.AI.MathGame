@@ -15,7 +15,7 @@ public class GameController : MonoBehaviour
     [SerializeField] private SolutionTargetController _solutionTargetController;
     [SerializeField] private HourglassController _hourglassController;
     [SerializeField] private ScoreProgressController _scoreProgressController;
-    [SerializeField] private CountdownController _countdownController;
+    [SerializeField] private RoundIntroController _roundIntroController;
 
     private IPlayerStatisticsService _statistics;
     private IGameConfigService _gameConfigService;
@@ -99,10 +99,7 @@ public class GameController : MonoBehaviour
         var numbersData = 
             await ServiceLocator.Get<INumberGeneratorService>().Async_GetAdditionNumbersInt(gameConfig);
 
-        await _countdownController.Async_StartCountdown(
-            new Queue<string>(new[] { "3", "2", "1", "GO!" }),
-            800
-            );
+        await _roundIntroController.StartRoundIntroFlow(numbersData.SolutionTarget);
 
         _bubblesController.SpawnBubblesInt(numbersData, () =>
         {

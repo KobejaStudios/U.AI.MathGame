@@ -8,6 +8,13 @@ using Random = UnityEngine.Random;
 public class Test : MonoBehaviour
 {
     [SerializeField] private Image _image;
+
+    private void Start()
+    {
+        PlayerPrefs.DeleteAll();
+        PlayerPrefs.Save();
+    }
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.A))
@@ -15,6 +22,14 @@ public class Test : MonoBehaviour
             SetImageColor();
         }
     }
+
+    [ContextMenu("clear playerprefs")]
+    private void ClearPrefs()
+    {
+        PlayerPrefs.DeleteAll();
+        PlayerPrefs.Save();
+    }
+    
 
     [ContextMenu("get set")]
     private void GetSet()
@@ -38,5 +53,20 @@ public class Test : MonoBehaviour
     private void SetImageColor()
     {
         _image.color = RandomColorSelector.Instance.GetColor();
+    }
+
+    [ContextMenu("show info popup")]
+    private void ShowInfoPopup()
+    {
+        PopupManager.Instance.ShowPopup(PopupNames.RoundStartInfoPopup, new Dictionary<string, object>
+        {
+            [GameParams.solution] = 999
+        });
+    }
+
+    [ContextMenu("close info popup")]
+    private void CloseInfoPopup()
+    {
+        Debug.Log(PlayerPrefs.GetInt(Prefs.DontShowInfoPopupAgain));
     }
 }
