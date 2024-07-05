@@ -8,6 +8,9 @@ using UnityEngine;
 public class SolutionTargetController : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _solutionTargetText;
+    [SerializeField] private NumberBubbleDisplay _leftBubble;
+    [SerializeField] private NumberBubbleDisplay _rightBubble;
+    [SerializeField] private RoundOverBannerController _roundOverBanner;
 
     private EquationStringState _equationStringState;
     private string _solutionTarget;
@@ -16,6 +19,7 @@ public class SolutionTargetController : MonoBehaviour
     private string _secondSlot;
 
     private CancellationTokenSource _cts = new();
+    private CancellationTokenSource _bannerCts = new();
     private void Start()
     {
         EventManager.AddListener(GameEvents.BubbleClicked, OnNumberBubbleClicked);
@@ -36,23 +40,26 @@ public class SolutionTargetController : MonoBehaviour
     {
         _cts.Cancel();
         _cts = new CancellationTokenSource();
+        _bannerCts = new CancellationTokenSource();
+        _roundOverBanner.ResetBanner();
         _solutionTargetText.text = "";
         _equationStringState = EquationStringState.Empty;
         _firstSlot = "";
         _secondSlot = "";
     }
     
-    private void OnRoundLost(Dictionary<string, object> arg0)
+    private async void OnRoundLost(Dictionary<string, object> arg0)
     {
-        _solutionTargetText.text = "Round Lost";
+        _roundOverBanner.UpdateText("Round Lost!");
+        await _roundOverBanner.TransitionBannerIn(1f, _bannerCts.Token);
     }
 
     private async void OnRoundWon(Dictionary<string, object> arg0)
     {
         // TODO: remove this small hack, this is just for stubbed purposes
         // we will need to improve how we handle win/loss conditions across the board
-        await UniTask.Delay(1000);
-        _solutionTargetText.text = "Round Won!";
+        _roundOverBanner.UpdateText("Round Won!");
+        await _roundOverBanner.TransitionBannerIn(1f, _bannerCts.Token);
     }
 
     private void OnNumbersGenerated(Dictionary<string, object> arg0)
@@ -86,12 +93,13 @@ public class SolutionTargetController : MonoBehaviour
         {
             case EquationStringState.Empty:
                 _firstSlot = input.ToString();
-                _solutionTargetText.text = $"<u>{input}</u> + ___ = {_solutionTarget}";
+                _leftBubble.UpdateText(input);
                 _equationStringState = EquationStringState.OneSlotFilled;
                 break;
             case EquationStringState.OneSlotFilled:
                 _secondSlot = input.ToString();
-                _solutionTargetText.text = $"<u>{_firstSlot}</u> + <u>{input}</u> = {_solutionTarget}";
+                _rightBubble.UpdateText(input);
+                _solutionTargetText.text = $"= {int.Parse(_firstSlot) + int.Parse(_secondSlot)}";
                 _equationStringState = EquationStringState.TwoSlotsFilled;
                 await AnimationStub(_cts.Token);
                 break;
@@ -99,7 +107,10 @@ public class SolutionTargetController : MonoBehaviour
                 _cts.Cancel();
                 _cts = new CancellationTokenSource();
                 _firstSlot = input.ToString();
-                _solutionTargetText.text = $"<u>{input}</u> + ___ = {_solutionTarget}";
+                _leftBubble.UpdateText(input);
+                _secondSlot = "";
+                _rightBubble.UpdateText("");
+                _solutionTargetText.text = $"= {_solutionTarget}";
                 _equationStringState = EquationStringState.OneSlotFilled;
                 break;
             default:
@@ -127,7 +138,9 @@ public class SolutionTargetController : MonoBehaviour
     {
         _firstSlot = "";
         _secondSlot = "";
-        _solutionTargetText.text = $"___ + ___ = {_solutionTarget}";
+        _solutionTargetText.text = $"= {_solutionTarget}";
+        _leftBubble.UpdateText(_firstSlot);
+        _rightBubble.UpdateText(_secondSlot);
         _equationStringState = EquationStringState.Empty;
     }
 }
