@@ -9,12 +9,6 @@ public class Test : MonoBehaviour
 {
     [SerializeField] private Image _image;
 
-    private void Start()
-    {
-        PlayerPrefs.DeleteAll();
-        PlayerPrefs.Save();
-    }
-
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.A))

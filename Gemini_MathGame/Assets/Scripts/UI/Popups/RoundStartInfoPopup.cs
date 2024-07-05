@@ -12,12 +12,7 @@ public class RoundStartInfoPopup : PopupBase
     {
         _toggle.isOn = PlayerPrefs.GetInt(Prefs.DontShowInfoPopupAgain) == 1;
         _toggle.onValueChanged.AddListener(OnToggleChanged);
-        _closeButton.onClick.AddListener(ClosePopup);
-    }
-
-    private void ClosePopup()
-    {
-        base.Close();
+        _closeButton.onClick.AddListener(() => Close());
     }
 
     protected override void ShowImpl()

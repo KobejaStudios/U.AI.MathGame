@@ -32,12 +32,9 @@ public abstract class PopupBase : MonoBehaviour
 
     private void OnDestroy()
     {
-        // Making sure that OnClose is always called, even when external forces eliminate the popup
         InvokeCloseCallbacks();
     }
     
-    // People tend to forget about calling the base implementation in overrides.
-    // So, splitting the `Show` implementation into 2 pieces to ensure that CurrentContext is always set
     protected virtual void ShowImpl() { }
 
     // Mostly intended for easy hook-up to Unity events. Prefer the normal Close() when invoking from the code
@@ -49,7 +46,14 @@ public abstract class PopupBase : MonoBehaviour
     public async virtual UniTask Close()
     {
         InvokeCloseCallbacks();
-        if (this) gameObject.SetActive(false);
+        EventManager.RaiseEvent(GameEvents.PopupClosed, new Dictionary<string, object>
+        {
+            [GameParams.popupName] = transform.name
+        });
+        if (this)
+        {
+            gameObject.SetActive(false);
+        }
     }
 
     // private async UniTask ShowTransition()
