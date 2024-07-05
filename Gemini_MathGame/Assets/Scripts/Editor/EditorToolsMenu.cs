@@ -4,7 +4,7 @@ namespace Editor
 {
     public static class EditorToolsMenu
     {
-        [MenuItem("DeletePlayerPrefs")]
+        [MenuItem("Tools/DeletePlayerPrefs")]
         private static void DeleteAllPlayerPrefs()
         {
             UnityEngine.PlayerPrefs.DeleteAll();
