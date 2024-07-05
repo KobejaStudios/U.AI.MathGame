@@ -24,6 +24,7 @@ public class RoundOverBannerController : MonoBehaviour
         var position = _rectTransform.position;
         var target = position.y - _rectHeight;
         await LMotion.Create(position.y, target, duration)
+            .WithEase(Ease.InSine)
             .BindToPositionY(_rectTransform)
             .ToValueTask(ct);
     }

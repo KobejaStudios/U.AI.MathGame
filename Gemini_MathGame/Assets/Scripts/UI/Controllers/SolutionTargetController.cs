@@ -4,6 +4,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SolutionTargetController : MonoBehaviour
 {
@@ -11,6 +12,11 @@ public class SolutionTargetController : MonoBehaviour
     [SerializeField] private NumberBubbleDisplay _leftBubble;
     [SerializeField] private NumberBubbleDisplay _rightBubble;
     [SerializeField] private RoundOverBannerController _roundOverBanner;
+
+    [Header("Right/Wrong Icon")]
+    [SerializeField] private Image _rightWrongIcon;
+    [SerializeField] private Sprite _checkmarkSprite;
+    [SerializeField] private Sprite _xSprite;
 
     private EquationStringState _equationStringState;
     private string _solutionTarget;
@@ -51,7 +57,7 @@ public class SolutionTargetController : MonoBehaviour
     private async void OnRoundLost(Dictionary<string, object> arg0)
     {
         _roundOverBanner.UpdateText("Round Lost!");
-        await _roundOverBanner.TransitionBannerIn(1f, _bannerCts.Token);
+        await _roundOverBanner.TransitionBannerIn(.7f, _bannerCts.Token);
     }
 
     private async void OnRoundWon(Dictionary<string, object> arg0)
@@ -59,7 +65,7 @@ public class SolutionTargetController : MonoBehaviour
         // TODO: remove this small hack, this is just for stubbed purposes
         // we will need to improve how we handle win/loss conditions across the board
         _roundOverBanner.UpdateText("Round Won!");
-        await _roundOverBanner.TransitionBannerIn(1f, _bannerCts.Token);
+        await _roundOverBanner.TransitionBannerIn(.7f, _bannerCts.Token);
     }
 
     private void OnNumbersGenerated(Dictionary<string, object> arg0)
